@@ -1,0 +1,52 @@
+.logo {
+    /* Add your logo styling */
+  }
+  
+  .navigation {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 20px;
+    margin: 0 auto;
+  }
+  
+  .navigation > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 1px;
+    margin: 0 5px;
+    color: #000;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+    background-color: transparent; /* Add this line to remove the background color */
+  }  
+  
+  .navigation > *:hover {
+    background-color: #ddd;
+  }
+  
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  
+  .employee-portal {
+    margin-left: 10px;
+  }
+  
