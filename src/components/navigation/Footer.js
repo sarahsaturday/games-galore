@@ -1,16 +1,18 @@
-/*
-Contains the email address, phone number, and a sitemap with links to different pages on the site.
-*/
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useNavigate } from "react-router-dom"
+import './Footer.css';
 
-function Footer() {
+export const Footer = () => {
   return (
     <footer>
-      <nav className="navigation">
-        <ul className="nav-links">
+      <div className="contact-info">
+        <h3>Contact Us</h3>
+        <p>Email: example@example.com</p>
+        <p>Phone: 123-456-7890</p>
+      </div>
+      <div className="sitemap">
+        <h3>Sitemap</h3>
+        <ul>
           <li>
             <Link to="/">Home</Link>
           </li>
@@ -20,10 +22,12 @@ function Footer() {
           <li>
             <Link to="/stores">Stores</Link>
           </li>
+          <li>
+            <Link to="/search">Search</Link>
+          </li>
+          {/* Add more links for other pages as needed */}
         </ul>
-      </nav>
+      </div>
     </footer>
   );
-}
-
-export default Header;
+};

@@ -1,0 +1,35 @@
+/* Footer.css */
+
+footer {
+    background-color: #f2f2f2;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .contact-info {
+    text-align: left;
+  }
+  
+  .contact-info h3 {
+    margin-bottom: 10px;
+  }
+  
+  .sitemap ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sitemap li {
+    margin-bottom: 5px;
+  }
+  
+  .sitemap a {
+    text-decoration: none;
+    color: #333;
+  }
+  
+  .sitemap a:hover {
+    text-decoration: underline;
+  }
+  
