@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./Login.css";
+import "./Pages.css";
 
 export const Login = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +21,9 @@ export const Login = () => {
               staff: user.isStaff,
             })
           );
+
+          // Dispatch storage event to update the user state in the Header component
+          window.dispatchEvent(new Event("storage"));
 
           navigate("/");
         } else {

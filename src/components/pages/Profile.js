@@ -1,37 +1,39 @@
 import React, { useEffect, useState } from 'react';
-import './Profile.css';
+import { useParams } from 'react-router-dom';
+import './Pages.css';
 
-export const Profile = ({ id, onLogout }) => {
+export const Profile = () => {
+  const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [profileType, setProfileType] = useState('');
 
   useEffect(() => {
-    // Fetch the user data based on the id
+    // Fetch the user data based on the userId
     const fetchUser = async () => {
       try {
         // Replace this with your own logic to fetch the user data
-        const response = await fetch(`http://localhost:8088/users?id=${id}`);
+        const response = await fetch(`http://localhost:8088/users?id=${userId}`);
         const userData = await response.json();
         setUser(userData);
-     
+
         if (userData.isStaff) {
-            const employeeResponse = await fetch(`http://localhost:8088/employees?userId=${id}`);
-            const employeeData = await employeeResponse.json();
-            setProfileType('employee');
-            setUser(prevUser => ({ ...prevUser, ...employeeData }));
-          } else {
-            const customerResponse = await fetch(`http://localhost:8088/customers?userId=${id}`);
-            const customerData = await customerResponse.json();
-            setProfileType('customer');
-            setUser(prevUser => ({ ...prevUser, ...customerData }));
-          }
-        } catch (error) {
-          console.error('An error occurred while fetching user:', error);
+          const employeeResponse = await fetch(`http://localhost:8088/employees?userId=${userId}`);
+          const employeeData = await employeeResponse.json();
+          setProfileType('employee');
+          setUser(prevUser => ({ ...prevUser, ...employeeData }));
+        } else {
+          const customerResponse = await fetch(`http://localhost:8088/customers?userId=${userId}`);
+          const customerData = await customerResponse.json();
+          setProfileType('customer');
+          setUser(prevUser => ({ ...prevUser, ...customerData }));
         }
-      };
+      } catch (error) {
+        console.error('An error occurred while fetching user:', error);
+      }
+    };
 
     fetchUser();
-  }, [id]);
+  }, [userId]);
 
   const handleLogout = () => {
     // Clear user session or perform any other logout logic
@@ -40,8 +42,8 @@ export const Profile = ({ id, onLogout }) => {
     // Show the "Goodbye!" alert
     alert('Goodbye!');
 
-    // Call the onLogout function passed as a prop
-    onLogout();
+    // Redirect the user back to the home page
+    window.location.href = '/';
   };
 
   const renderEmployeeProfile = () => {

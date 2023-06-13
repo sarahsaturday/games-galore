@@ -1,20 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import './Header.css';
+import './Navigation.css';
 
 export const Header = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Retrieve the user object from local storage
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
 
-    // Set the user object in the state
     setUser(storedUser);
   }, []);
 
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('gg_user'));
+      setUser(updatedUser);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
   const isLoggedIn = !!user;
-  const isEmployee = isLoggedIn && user?.staff;
+  const isEmployee = isLoggedIn && user?.isStaff;
 
   return (
     <header>
@@ -36,11 +47,7 @@ export const Header = () => {
           </div>
         )}
         <Link to="/">Home</Link>
-        {isLoggedIn && (
-          <React.Fragment>
-            <Link to={`/profile/${user.id}`}>Profile</Link>
-          </React.Fragment>
-        )}
+        {isLoggedIn && <Link to={`/profile/${user.id}`}>Profile</Link>}
         {!isLoggedIn && <Link to="/login">Login/Register</Link>}
       </nav>
     </header>
