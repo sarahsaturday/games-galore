@@ -117,11 +117,12 @@ export const Register = () => {
                     };
                   
                     const handleCloseConfirmation = () => {
-                      setShowConfirmation(false);
-                  
-                      // Navigate to the profile page
-                      navigate('/profile'); // Replace '/profile' with the actual route to the profile page
-                    };
+                        // Show the confirmation message in an alert window
+                        window.alert('Thank you for registering!');
+                        
+                        // Navigate to the profile page
+                        navigate('/profile'); // Replace '/profile' with the actual route to the profile page
+                      };
 
     return (
         <div className="register-container">
