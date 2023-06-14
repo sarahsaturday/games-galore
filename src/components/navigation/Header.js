@@ -25,7 +25,7 @@ export const Header = () => {
   }, []);
 
   const isLoggedIn = !!user;
-  const isEmployee = isLoggedIn && user?.isStaff;
+  const isEmployee = isLoggedIn && user?.staff;
 
   return (
     <header>

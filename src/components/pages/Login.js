@@ -18,7 +18,7 @@ export const Login = () => {
             "gg_user",
             JSON.stringify({
               id: user.id,
-              staff: user.isStaff,
+              isStaff: user.isStaff,
             })
           );
 
