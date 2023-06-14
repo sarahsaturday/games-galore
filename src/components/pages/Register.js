@@ -14,6 +14,7 @@ export const Register = () => {
     const [startDate, setStartDate] = useState('');
     const [hourlyRate, setHourlyRate] = useState('');
     const [managers, setManagers] = useState(false);
+    const [newUserType, setNewUserType] = useState('');
 
     useEffect(() => {
         // Fetch stores from the database
@@ -30,6 +31,7 @@ export const Register = () => {
 
     const handleUserTypeChange = (e) => {
         setUserType(e.target.value);
+        setNewUserType(e.target.value === 'employee' ? 'employee' : 'customer');
     };
 
     const handleSubmit = (e) => {
@@ -49,9 +51,12 @@ export const Register = () => {
                     email,
                     phone,
                     streetAddress: address,
-                    isStaff: userType === 'employee' ? 'employee' : 'customer',
+                    isStaff: userType === 'employee',
                     isManager: userType === 'employee' && managers,
                 };
+
+                // Determine the type of the new user
+                const newUserType = newUser.isStaff ? 'employee' : 'customer';
 
                 // Add the new user to the users database
                 fetch('http://localhost:8088/users', {
@@ -62,7 +67,7 @@ export const Register = () => {
                     body: JSON.stringify(newUser),
                 })
                     .then(() => {
-                        if (userType === 'customer') {
+                        if (newUserType === 'customer') {
                             // Fetch existing customers from the database
                             fetch('http://localhost:8088/customers')
                                 .then((response) => response.json())
@@ -111,7 +116,7 @@ export const Register = () => {
                                 .catch((error) => {
                                     console.error('Error fetching customers:', error);
                                 });
-                        } else if (userType === 'employee' && newUser.isStaff) {
+                        } else if (newUserType === 'employee') {
                             // Fetch existing employees from the database
                             fetch('http://localhost:8088/employees')
                                 .then((response) => response.json())
@@ -124,8 +129,8 @@ export const Register = () => {
                                     // Existing logic for isStaff=true
                                     const newEmployee = {
                                         id: highestEmployeeId + 1, // Convert to integer
-                                        startDate,
-                                        payRate: hourlyRate,
+                                        startDate: new Date(startDate), // Convert to date object
+                                        payRate: parseFloat(hourlyRate),
                                         userId: newUser.id,
                                         storeId: parseInt(selectedStore),
                                     };
@@ -194,149 +199,148 @@ export const Register = () => {
                                 });
                         }
                     });
-                    })
-                }
-             
+            })
+    }
 
 
-                        return (
-                            <div className="register-container">
-                                <h2>New {userType === 'customer' ? 'Customer' : 'Employee'}</h2>
-                                <form onSubmit={handleSubmit}>
-                                    <div>
-                                        Choose One: <label>
-                                            <input
-                                                type="radio"
-                                                value="customer"
-                                                checked={userType === 'customer'}
-                                                onChange={handleUserTypeChange}
-                                            />
-                                            I am a Customer&nbsp;
-                                        </label>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                value="employee"
-                                                checked={userType === 'employee'}
-                                                onChange={handleUserTypeChange}
-                                            />
-                                            I am an Employee
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <label>
-                                            Full Name:&nbsp;
-                                            <input
-                                                type="text"
-                                                value={fullName}
-                                                onChange={(e) => setFullName(e.target.value)}
-                                                required
-                                                placeholder="First Last"
-                                            />
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <label>
-                                            Email:&nbsp;
-                                            <input
-                                                type="email"
-                                                value={email}
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                required
-                                                placeholder="email@email.com"
-                                            />
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <label>
-                                            Phone:&nbsp;
-                                            <input
-                                                type="text"
-                                                value={phone}
-                                                onChange={(e) => setPhone(e.target.value)}
-                                                required
-                                                placeholder="333-333-3333"
-                                            />
-                                        </label>
-                                    </div>
-                                    {userType === 'customer' ? (
-                                        <div>
-                                            <label>
-                                                Street Address:&nbsp;
-                                                <input
-                                                    type="text"
-                                                    value={address}
-                                                    onChange={(e) => setAddress(e.target.value)}
-                                                    required
-                                                    placeholder="333 3rd St"
-                                                />
-                                            </label>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            <label>
-                                                Store:&nbsp;
-                                                <select
-                                                    value={selectedStore}
-                                                    onChange={(e) => setSelectedStore(e.target.value)}
-                                                    required
-                                                >
-                                                    {stores.map((store) => (
-                                                        <option key={store.id} value={store.id}>
-                                                            {store.storeName}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </label>
-                                        </div>
-                                    )}
-                                    {userType === 'employee' && (
-                                        <div>
-                                            <label>
-                                                Start Date:&nbsp;
-                                                <input
-                                                    type="date"
-                                                    value={startDate}
-                                                    onChange={(e) => setStartDate(e.target.value)}
-                                                    required
-                                                />
-                                            </label>
-                                        </div>
-                                    )}
-                                    {userType === 'employee' && (
-                                        <div>
-                                            <label>
-                                                Hourly Rate:&nbsp;
-                                                <input
-                                                    type="number"
-                                                    step="0.00"
-                                                    value={hourlyRate}
-                                                    onChange={(e) => setHourlyRate(e.target.value)}
-                                                    required
-                                                    placeholder="33.33"
-                                                />
-                                            </label>
-                                        </div>
-                                    )}
-                                    {userType === 'employee' && (
-                                        <div>
-                                            <label>
-                                                Check if Manager: &nbsp;
-                                                <input
-                                                    type="checkbox"
-                                                    checked={managers}
-                                                    onChange={(e) => setManagers(e.target.checked)}
-                                                />
-                                            </label>
-                                        </div>
-                                    )}
-                                    <button type="submit">Register</button>
-                                    <p><Link to="/">Cancel</Link>
-                                    </p>
-                                </form>
-                                <p>
-                                    Already have an account? <Link to="/login">Log in here</Link>
-                                </p>
-                            </div>
-                        );
-                    };
+
+    return (
+        <div className="register-container">
+            <h2>New {newUserType === 'customer' ? 'Customer' : 'Employee'}</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    Choose One: <label>
+                        <input
+                            type="radio"
+                            value="customer"
+                            checked={newUserType === 'customer'}
+                            onChange={handleUserTypeChange}
+                        />
+                        I am a Customer&nbsp;
+                    </label>
+                    <label>
+                        <input
+                            type="radio"
+                            value="employee"
+                            checked={newUserType === 'employee'}
+                            onChange={handleUserTypeChange}
+                        />
+                        I am an Employee
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Full Name:&nbsp;
+                        <input
+                            type="text"
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            required
+                            placeholder="First Last"
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Email:&nbsp;
+                        <input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            placeholder="email@email.com"
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Phone:&nbsp;
+                        <input
+                            type="text"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            required
+                            placeholder="333-333-3333"
+                        />
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        Street Address:&nbsp;
+                        <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            required
+                            placeholder="333 3rd St"
+                        />
+                    </label>
+                </div>
+                {newUserType === 'employee' && (
+                    <div>
+                        <label>
+                            Store:&nbsp;
+                            <select
+                                value={selectedStore}
+                                onChange={(e) => setSelectedStore(e.target.value)}
+                                required
+                            >
+                                {stores.map((store) => (
+                                    <option key={store.id} value={store.id}>
+                                        {store.storeName}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                    </div>
+                )}
+                {newUserType === 'employee' && (
+                    <div>
+                        <label>
+                            Start Date:&nbsp;
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                required
+                            />
+                        </label>
+                    </div>
+                )}
+                {newUserType === 'employee' && (
+                    <div>
+                        <label>
+                            Hourly Rate:&nbsp;
+                            <input
+                                type="number"
+                                step="0.00"
+                                value={hourlyRate}
+                                onChange={(e) => setHourlyRate(e.target.value)}
+                                required
+                                placeholder="33.33"
+                            />
+                        </label>
+                    </div>
+                )}
+                {newUserType === 'employee' && (
+                    <div>
+                        <label>
+                            Check if Manager: &nbsp;
+                            <input
+                                type="checkbox"
+                                checked={managers}
+                                onChange={(e) => setManagers(e.target.checked)}
+                            />
+                        </label>
+                    </div>
+                )}
+                <button type="submit">Register</button>
+                <p><Link to="/">Cancel</Link>
+                </p>
+            </form>
+            <p>
+                Already have an account? <Link to="/login">Log in here</Link>
+            </p>
+        </div>
+    );
+};
