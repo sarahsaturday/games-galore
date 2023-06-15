@@ -127,7 +127,7 @@ export const Register = () => {
                                     // Existing logic for isStaff=true
                                     const newEmployee = {
                                         id: highestEmployeeId + 1, // Convert to integer
-                                        startDate: new Date(startDate), // Convert to date object
+                                        startDate: new Date(startDate).toISOString().split('T')[0], // Format as "YYYY-MM-DD"
                                         payRate: parseFloat(hourlyRate),
                                         userId: newUser.id,
                                         storeId: parseInt(selectedStore),
