@@ -54,7 +54,7 @@ export const Register = () => {
                 };
 
                 // Determine the type of the new user
-                const userType = newUser.isStaff ? 'employee' : 'customer';
+                const newUserType = newUser.isStaff ? 'employee' : 'customer';
 
                 // Add the new user to the users database
                 fetch('http://localhost:8088/users', {

@@ -25,7 +25,7 @@ export const Header = () => {
   }, []);
 
   const isLoggedIn = !!user;
-  const isEmployee = isLoggedIn && user?.staff;
+  const isEmployee = isLoggedIn && user?.isStaff;
 
   return (
     <header>
@@ -47,7 +47,9 @@ export const Header = () => {
           </div>
         )}
         <Link to="/">Home</Link>
-        {isLoggedIn && <Link to={`/profile/${user.id}`}>Profile</Link>}
+        {isLoggedIn && user && (
+          <Link to={`/profile/${user.id}`}>Profile</Link>
+        )}
         {!isLoggedIn && <Link to="/login">Login/Register</Link>}
       </nav>
     </header>
