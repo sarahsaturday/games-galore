@@ -1,11 +1,29 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom'
 import './Pages.css';
 
 export const Games = ({}) => {
+    const [user, setUser] = useState(null);
   const [games, setGames] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stores, setStores] = useState([]);
   const [gamesInStores, setGamesInStores] = useState([]);
+
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('gg_user'));
+    setUser(storedUser);
+
+    const handleStorageChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('gg_user'));
+      setUser(updatedUser);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   useEffect(() => {
     // Fetch data from API
@@ -34,6 +52,24 @@ export const Games = ({}) => {
     fetchData();
   }, []);
 
+  
+  const handleEdit = (gameId) => {
+    // Handle edit functionality, e.g., redirect to the edit game page
+    console.log('Edit game:', gameId);
+  };
+
+  const handleSave = (gameId) => {
+    // Handle edit functionality, e.g., redirect to the edit game page
+    console.log('Edit game:', gameId);
+  };
+
+  const handleDelete = (gameId) => {
+    // Handle delete functionality, e.g., show confirmation dialog and delete the game
+    console.log('Delete game:', gameId);
+  };
+
+  const isEmployee = user?.isStaff;
+
   return (
     <div>
       <h1>Games</h1>
@@ -55,6 +91,20 @@ export const Games = ({}) => {
             <p>Category: {category ? category.categoryName : ''}</p>
             <p>Price: ${price.toFixed(2)}</p>
             <p>Available at: {gameStores}</p>
+
+            {isEmployee && (
+              <div>
+                <button className="action-button" onClick={() => handleEdit(id)}>
+                  Edit
+                </button>
+                <button className="action-button" onClick={() => handleSave(id)}>
+                  Save
+                </button>
+                <button className="action-button" onClick={() => handleDelete(id)}>
+                  Delete
+                </button>
+              </div>
+            )}
           </div>
         );
       })}

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navigation.css';
 
 export const Header = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -27,6 +28,13 @@ export const Header = () => {
   const isLoggedIn = !!user;
   const isEmployee = isLoggedIn && user?.isStaff;
 
+  const handleEmployeePortalChange = (event) => {
+    const selectedPage = event.target.value;
+    if (selectedPage) {
+      navigate(selectedPage);
+    }
+  };
+
   return (
     <header>
       <div className="logo">
@@ -35,11 +43,11 @@ export const Header = () => {
       <nav className="navigation">
         {isLoggedIn && isEmployee && (
           <div className="dropdown">
-            <select className="employee-portal" defaultValue="">
+            <select className="employee-portal" defaultValue="" onChange={handleEmployeePortalChange}>
               <option disabled value="">
                 Employee Portal
               </option>
-              <option value="/games">Manage Products</option>
+              <option value="/games">Manage Games</option>
               <option value="/stores">Manage Stores</option>
               <option value="/customers">Manage Customers</option>
               <option value="/employees">Manage Employees</option>
@@ -47,6 +55,8 @@ export const Header = () => {
           </div>
         )}
         <Link to="/">Home</Link>
+        <Link to="/games">Games</Link>
+        <Link to="/stores">Stores</Link>
         {isLoggedIn && user && (
           <Link to={`/profile/${user.id}`}>Profile</Link>
         )}
