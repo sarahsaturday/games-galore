@@ -18,8 +18,9 @@ export const Profile = () => {
         setUser(userData);
 
         if (userData.isStaff === true) {
-          const employeeResponse = await fetch(`http://localhost:8088/employees?id=${userId}`);
+          const employeeResponse = await fetch(`http://localhost:8088/employees?userId=${userId}`);
           const employeeData = await employeeResponse.json();
+          
           setProfileType('employee');
           setUser(prevUser => ({ ...prevUser, ...employeeData[0] }));
 
@@ -29,7 +30,7 @@ export const Profile = () => {
           setStoreName(storeData.storeName);
 
         } else {
-          const customerResponse = await fetch(`http://localhost:8088/customers?id=${userId}`);
+          const customerResponse = await fetch(`http://localhost:8088/customers?userId=${userId}`);
           const customerData = await customerResponse.json();
           setProfileType('customer');
           setUser(prevUser => ({ ...prevUser, ...customerData[0] }));
@@ -56,12 +57,6 @@ export const Profile = () => {
   const renderEmployeeProfile = () => {
     if (user && profileType === 'employee') {
 
-      const formattedStartDate = new Date(user.startDate.replace('00:00:00.000Z', '')).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-
       const formattedPayRate = user.payRate ? `$${user.payRate.toFixed(2)} per hour` : '';
 
       return (
@@ -72,7 +67,7 @@ export const Profile = () => {
             <br />
             Store Assignment: {storeName}
             <br />
-            Start Date: {formattedStartDate}
+            Start Date: {user.startDate}
             <br />
             Pay Rate: {formattedPayRate}
             <br />

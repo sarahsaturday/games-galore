@@ -14,7 +14,6 @@ export const Register = () => {
     const [startDate, setStartDate] = useState('');
     const [hourlyRate, setHourlyRate] = useState('');
     const [managers, setManagers] = useState(false);
-    const [newUserType, setNewUserType] = useState('');
 
     useEffect(() => {
         // Fetch stores from the database
@@ -30,8 +29,7 @@ export const Register = () => {
     }, []);
 
     const handleUserTypeChange = (e) => {
-        setUserType(e.target.value);
-        setNewUserType(e.target.value === 'employee' ? 'employee' : 'customer');
+        setUserType(e.target.value === 'employee' ? 'employee' : 'customer');
     };
 
     const handleSubmit = (e) => {
@@ -56,7 +54,7 @@ export const Register = () => {
                 };
 
                 // Determine the type of the new user
-                const newUserType = newUser.isStaff ? 'employee' : 'customer';
+                const userType = newUser.isStaff ? 'employee' : 'customer';
 
                 // Add the new user to the users database
                 fetch('http://localhost:8088/users', {
@@ -67,7 +65,7 @@ export const Register = () => {
                     body: JSON.stringify(newUser),
                 })
                     .then(() => {
-                        if (newUserType === 'customer') {
+                        if (userType === 'customer') {
                             // Fetch existing customers from the database
                             fetch('http://localhost:8088/customers')
                                 .then((response) => response.json())
@@ -116,7 +114,7 @@ export const Register = () => {
                                 .catch((error) => {
                                     console.error('Error fetching customers:', error);
                                 });
-                        } else if (newUserType === 'employee') {
+                        } else if (userType === 'employee') {
                             // Fetch existing employees from the database
                             fetch('http://localhost:8088/employees')
                                 .then((response) => response.json())
@@ -206,14 +204,14 @@ export const Register = () => {
 
     return (
         <div className="register-container">
-            <h2>New {newUserType === 'customer' ? 'Customer' : 'Employee'}</h2>
+            <h2>New {userType === 'customer' ? 'Customer' : 'Employee'}</h2>
             <form onSubmit={handleSubmit}>
                 <div>
                     Choose One: <label>
                         <input
                             type="radio"
                             value="customer"
-                            checked={newUserType === 'customer'}
+                            checked={userType === 'customer'}
                             onChange={handleUserTypeChange}
                         />
                         I am a Customer&nbsp;
@@ -222,7 +220,7 @@ export const Register = () => {
                         <input
                             type="radio"
                             value="employee"
-                            checked={newUserType === 'employee'}
+                            checked={userType === 'employee'}
                             onChange={handleUserTypeChange}
                         />
                         I am an Employee
@@ -276,7 +274,7 @@ export const Register = () => {
                         />
                     </label>
                 </div>
-                {newUserType === 'employee' && (
+                {userType === 'employee' && (
                     <div>
                         <label>
                             Store:&nbsp;
@@ -294,7 +292,7 @@ export const Register = () => {
                         </label>
                     </div>
                 )}
-                {newUserType === 'employee' && (
+                {userType === 'employee' && (
                     <div>
                         <label>
                             Start Date:&nbsp;
@@ -307,7 +305,7 @@ export const Register = () => {
                         </label>
                     </div>
                 )}
-                {newUserType === 'employee' && (
+                {userType === 'employee' && (
                     <div>
                         <label>
                             Hourly Rate:&nbsp;
@@ -322,7 +320,7 @@ export const Register = () => {
                         </label>
                     </div>
                 )}
-                {newUserType === 'employee' && (
+                {userType === 'employee' && (
                     <div>
                         <label>
                             Check if Manager: &nbsp;
