@@ -7,6 +7,7 @@ import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { Header } from './navigation/Header';
 import { Games } from './pages/Games'
+import { Customers } from './pages/Customers'
 
 export const GamesGalore = () => {
   return (
@@ -18,6 +19,7 @@ export const GamesGalore = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/profile/:userId" element={<Profile />} />
         <Route path="/games" element={<Games />} />
+        <Route path="/customers" element={<Customers />} />
       </Routes>
       <Footer />
     </>
