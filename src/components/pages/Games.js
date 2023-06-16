@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'
 import './Pages.css';
+import { GameForm } from './GameForm';
 
 export const Games = ({ }) => {
   const [user, setUser] = useState(null);
@@ -12,6 +13,7 @@ export const Games = ({ }) => {
   const [updatedCategoryId, setUpdatedCategoryId] = useState('');
   const [updatedPrice, setUpdatedPrice] = useState('');
   const [updatedStoreIds, setUpdatedStoreIds] = useState([]);
+  const [nextId, setNextId] = useState(0);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -44,13 +46,17 @@ export const Games = ({ }) => {
         const storesResponse = await fetch('http://localhost:8088/stores');
         const storesData = await storesResponse.json();
         setStores(storesData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
+      // Calculate the next available id
+      const highestId = Math.max(...gamesData.map(game => game.id));
+      const nextId = highestId + 1;
+      setNextId(nextId);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
-    fetchData();
-  }, []);
+  fetchData();
+}, []);
 
 
   const handleEdit = (gameId) => {
@@ -113,22 +119,38 @@ export const Games = ({ }) => {
   };
     
 
-  const handleDelete = (gameId) => {
-    console.log('Delete game:', gameId);
+  const handleDelete = async (gameId) => {
+    try {
+      await fetch(`http://localhost:8088/games/${gameId}`, {
+        method: 'DELETE',
+      });
+  
+      const updatedGames = games.filter((game) => game.id !== gameId);
+      setGames(updatedGames);
+  
+      window.alert('Game deleted!');
+    } catch (error) {
+      console.error('Error deleting game:', error);
+    }
   };
 
   const isEmployee = user?.isStaff;
 
   return (
     <div>
+      {user?.isStaff && (
+        <div>
+          <GameForm nextId={nextId} />
+        </div>
+      )}
+
       <h1>Games</h1>
-      {games.map((game) => {
-        const { id, gameTitle, categoryId, price, imageUrl, storeIds } = game;
-        const category = categories.find((category) => category.id === categoryId);
-        const gameStores = stores
-          .filter((store) => storeIds.includes(store.id))
-          .map((store) => store.storeName)
-          .join(', ');
+    {games.map(({ id, gameTitle, categoryId, price, imageUrl, storeIds }) => {
+      const category = categories.find((category) => category.id === categoryId);
+      const gameStores = stores
+        .filter((store) => storeIds.includes(store.id))
+        .map((store) => store.storeName)
+        .join(', ');
 
         return (
           <div key={id}>

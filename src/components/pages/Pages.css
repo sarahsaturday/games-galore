@@ -260,3 +260,67 @@ p {
 .action-button {
   margin-right: 8px;
 }
+
+/* Games Form Styling */
+
+.games-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+
+.games-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.games-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.games-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.games-form-input,
+.games-form-select {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.games-form-button {
+  padding: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.games-form-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Games Page Styling */
+
+.game {
+  display: flex;
+  align-items: center;
+}
+
+.game img {
+  width: 100px; /* Adjust the size as needed */
+  margin-right: 10px; /* Add spacing between the image and details */
+}
+
+.game-details {
+  flex-grow: 1; /* Allow the details to expand and fill the remaining space */
+}
