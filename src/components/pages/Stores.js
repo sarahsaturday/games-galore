@@ -1,32 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { StoreForm } from './StoreForm';
 import './Pages.css';
 
 export const Stores = () => {
   const [stores, setStores] = useState([]);
-  const [employees, setEmployees] = useState([]);
-  const [users, setUsers] = useState([])
+  const [user, setUser] = useState([])
+  const [games, setGames] = useState([])
   const [editedStore, setEditedStore] = useState(null);
   const [updatedStoreName, setUpdatedStoreName] = useState('');
   const [updatedAddress, setUpdatedAddress] = useState('');
   const [updatedPhone, setUpdatedPhone] = useState('');
-  const [updatedEmployeeIds, setUpdatedEmployeeIds] = useState([]);
+  const [nextId, setNextId] = useState(0);
+ const [updatedHours, setUpdatedHours] = useState('');
 
   useEffect(() => {
-    // Fetch data from API
+    const storedUser = JSON.parse(localStorage.getItem('gg_user'));
+    setUser(storedUser);
+
+    const handleStorageChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('gg_user'));
+      setUser(updatedUser);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const storesResponse = await fetch('http://localhost:8088/stores');
-        const storesData = await storesResponse.json();
-        setStores(storesData);
+        const response = await fetch('http://localhost:8088/stores');
+        const data = await response.json();
 
-        const usersResponse = await fetch('http://localhost:8088/users');
-        const usersData = await usersResponse.json();
-        setUsers(usersData);
-
-        const employeesResponse = await fetch('http://localhost:8088/employees');
-        const employeesData = await employeesResponse.json();
-        setEmployees(employeesData);
+        setStores(data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -41,17 +50,7 @@ export const Stores = () => {
     setUpdatedStoreName(store.storeName);
     setUpdatedAddress(store.storeAddress);
     setUpdatedPhone(store.storePhone);
-    setUpdatedEmployeeIds(store.employeeId);
-  };
-
-  const handleEmployeeCheckboxChange = (e, employeeId) => {
-    const isChecked = e.target.checked;
-
-    if (isChecked) {
-      setUpdatedEmployeeIds((prevEmployeeIds) => [...prevEmployeeIds, employeeId]);
-    } else {
-      setUpdatedEmployeeIds((prevEmployeeIds) => prevEmployeeIds.filter((id) => id !== employeeId));
-    }
+    setUpdatedHours(store.storeHours)
   };
 
   const handleSave = async (storeId) => {
@@ -60,20 +59,10 @@ export const Stores = () => {
       storeName: updatedStoreName,
       storeAddress: updatedAddress,
       storePhone: updatedPhone,
-      employeeId: updatedEmployeeIds,
+      storeHours: updatedHours
     };
 
     try {
-      const updatedStores = stores.map((store) => {
-        if (store.id === storeId) {
-          return updatedStore;
-        }
-        return store;
-      });
-
-      setEditedStore(updatedStore);
-
-      // Send the updated store data to the API
       await fetch(`http://localhost:8088/stores/${storeId}`, {
         method: 'PUT',
         headers: {
@@ -82,102 +71,77 @@ export const Stores = () => {
         body: JSON.stringify(updatedStore),
       });
 
-      // Update the state with the updated data
+      const updatedStores = stores.map((store) => (store.id === storeId ? updatedStore : store));
       setStores(updatedStores);
 
+      setEditedStore(null);
+
       window.alert('Changes saved!');
-      window.location.reload();
     } catch (error) {
       console.error('Error updating store:', error);
     }
   };
 
-  const handleDelete = async (storeId) => {
-    try {
-      await fetch(`http://localhost:8088/stores/${storeId}`, {
-        method: 'DELETE',
-      });
-
-      const updatedStores = stores.filter((store) => store.id !== storeId);
-      setStores(updatedStores);
-
-      window.alert('Store deleted!');
-    } catch (error) {
-      console.error('Error deleting store:', error);
-    }
-  };
+  const isEmployee = user?.isStaff;
 
   return (
     <div>
-      <h1>Stores</h1>
-      {stores.map(({ id, storeName, storeAddress, storePhone, storeHours, employeeId }) => (
-        <div key={id}>
-          <h2>{storeName}</h2>
-          <p>Address: {storeAddress}</p>
-          <p>Phone: {storePhone} </p>
-          <p>Store Hours: {storeHours} </p>
-
-          {editedStore && editedStore.id === id && (
-            <div>
-              <input
-                type="text"
-                placeholder="Enter store name"
-                value={updatedStoreName}
-                onChange={(e) => setUpdatedStoreName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Enter store address"
-                value={updatedAddress}
-                onChange={(e) => setUpdatedAddress(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Phone number"
-                value={updatedPhone}
-                onChange={(e) => setUpdatedPhone(e.target.value)}
-              />
-
-<div>
-  <p>Employees at this location:</p>
-  {employees.map((employee) => {
-    const user = users.find((user) => user.id === employee.userId);
-    const fullName = user ? user.fullName : '';
-
-    return (
-      <label key={employee.id}>
-        <input
-          type="checkbox"
-          value={employee.id}
-          checked={updatedEmployeeIds.includes(employee.id)}
-          onChange={(e) => handleEmployeeCheckboxChange(e, employee.id)}
-        />
-        {fullName}
-      </label>
-    );
-  })}
-</div>
-              <button className="action-button" onClick={() => handleSave(id)}>
-                Save
-              </button>
-              <button className="action-button" onClick={() => setEditedStore(null)}>
-                Cancel
-              </button>
+      {isEmployee && (
+        <div>
+          <StoreForm nextId={nextId} />
+        </div>
+      )}
+  
+      <div className="object-list">
+        <h1>Stores</h1>
+        {stores.map(({ id, storeName, storeAddress, storePhone, storeHours }) => (
+          <div key={id} className="object-item">
+            <div className="object-details">
+              <h2>{storeName}</h2>
+              <p>Address: {storeAddress}</p>
+              <p>Phone: {storePhone}</p>
+              <p>Store Hours: {storeHours}</p>
             </div>
-          )}
-
-          {!editedStore && (
-            <div>
-              <button className="action-button" onClick={() => handleEdit(id)}>
-                Edit
-              </button>
-              <button className="action-button" onClick={() => handleDelete(id)}>
-                Delete
-              </button>
+  
+            {isEmployee && editedStore && editedStore.id === id && (
+              <div className="edit-object">
+                <input
+                  type="text"
+                  id="storeName"
+                  value={storeName}
+                  onChange={(e) => setUpdatedStoreName(e.target.value)}
+                />
+                <input
+                  type="text"
+                  id="storeAddress"
+                  value={storeAddress}
+                  onChange={(e) => setUpdatedAddress(e.target.value)}
+                />
+                <input
+                  type="text"
+                  id="storePhone"
+                  value={storePhone}
+                  onChange={(e) => setUpdatedPhone(e.target.value)}
+                />
+  
+                <button className="action-button" onClick={() => handleSave(id)}>
+                  Save
+                </button>
+                <button className="action-button" onClick={() => setEditedStore(null)}>
+                  Cancel
+                </button>
+              </div>
+            )}
+  
+  {isEmployee && !editedStore && (
+  <div>
+    <button className="action-button" onClick={() => handleEdit(id)}>
+      View/Edit Details
+    </button>
             </div>
           )}
         </div>
       ))}
     </div>
-  );
-};
+  </div>
+)};

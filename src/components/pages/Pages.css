@@ -1,3 +1,20 @@
+/* Common Styling */
+
+body {
+  text-align: left;
+}
+
+button,
+input,
+select {
+  text-align: left;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
 /* Home Page Styling */
 
 .buttons-container {
@@ -90,11 +107,6 @@
   border: 1px solid #ddd;
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
 form {
   display: flex;
   flex-direction: column;
@@ -126,7 +138,7 @@ button:hover {
 
 p {
   margin-top: 16px;
-  text-align: center;
+  text-align: left;
 }
 
 p a {
@@ -146,11 +158,6 @@ p a:hover {
   padding: 20px;
   background-color: #f7f7f7;
   border: 1px solid #ddd;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 form {
@@ -215,11 +222,6 @@ input::placeholder {
   padding: 20px;
   background-color: #f7f7f7;
   border: 1px solid #ddd;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
 }
 
 p {
@@ -323,4 +325,82 @@ p {
 
 .game-details {
   flex-grow: 1; /* Allow the details to expand and fill the remaining space */
+}
+
+/* Store Form Styling */
+
+.store-form {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+}
+
+.store-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.store-form form {
+  display: flex;
+  flex-direction: column;
+}
+
+.store-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.store-form-input,
+.store-form-select {
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.store-form-button {
+  padding: 10px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.store-form-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Store Page Styling */
+
+.store-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.store-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.store-details {
+  margin-bottom: 10px;
+  align-items: flex-start;
+}
+
+.edit-store,
+.store-actions {
+  display: flex;
+}
+
+.edit-store input,
+.edit-store button,
+.store-actions button {
+  margin-right: 10px;
 }

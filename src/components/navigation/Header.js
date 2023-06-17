@@ -27,6 +27,7 @@ export const Header = () => {
 
   const isLoggedIn = !!user;
   const isEmployee = isLoggedIn && user?.isStaff;
+  const isCustomer = isLoggedIn && !isEmployee;
 
   const handleEmployeePortalChange = (event) => {
     const selectedPage = event.target.value;
@@ -43,7 +44,7 @@ export const Header = () => {
       <nav className="navigation">
         {isLoggedIn && isEmployee && (
           <div className="dropdown">
-            <select className="employee-portal" defaultValue="" onChange={handleEmployeePortalChange}>
+            <select id="employeePortal" className="employee-portal" defaultValue="" onChange={handleEmployeePortalChange}>
               <option disabled value="">
                 Employee Portal
               </option>
@@ -54,13 +55,33 @@ export const Header = () => {
             </select>
           </div>
         )}
-        <Link to="/">Home</Link>
-        <Link to="/games">Games</Link>
-        <Link to="/stores">Stores</Link>
-        {isLoggedIn && user && (
-          <Link to={`/profile/${user.id}`}>Profile</Link>
+        {(!isLoggedIn && !isEmployee) && (
+          <>
+            <Link to="/">Home</Link>
+            <Link to="/games">Games</Link>
+            <Link to="/stores">Stores</Link>
+            <Link to="/login">Login/Register</Link>
+          </>
         )}
-        {!isLoggedIn && <Link to="/login">Login/Register</Link>}
+        
+        {(isLoggedIn && user) && (
+          <>
+            <Link to="/">Home</Link>
+          </>
+        )}
+
+        {(isLoggedIn && isCustomer) && (
+          <>
+            <Link to="/games">Games</Link>
+            <Link to="/stores">Stores</Link>
+          </>
+        )}
+
+        {(isLoggedIn && user) && (
+          <>
+            <Link to={`/profile/${user.id}`}>Profile</Link>
+          </>
+        )}
       </nav>
     </header>
   );

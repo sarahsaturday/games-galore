@@ -9,6 +9,7 @@ import { Header } from './navigation/Header';
 import { Games } from './pages/Games'
 import { Customers } from './pages/Customers'
 import { Stores } from './pages/Stores';
+import { Employees } from './pages/Employees'
 
 export const GamesGalore = () => {
   return (
@@ -22,6 +23,7 @@ export const GamesGalore = () => {
         <Route path="/games" element={<Games />} />
         <Route path="/customers" element={<Customers />} />
         <Route path="/stores" element={<Stores />} />
+        <Route path="/employees" element={<Employees />} />
       </Routes>
       <Footer />
     </>

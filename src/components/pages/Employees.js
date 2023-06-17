@@ -1,28 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import './Pages.css';
 
-export const Customers = () => {
-  const [users, setUsers] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [editedUser, setEditedUser] = useState(null);
-  const [editedCustomer, setEditedCustomer] = useState(null);
-  const [updatedFullName, setUpdatedFullName] = useState('');
+export const Employees = () => {
+  const [employees, setEmployees] = useState([]);
+  const [editedEmployee, setEditedEmployee] = useState(null);
+  const [updatedStartDate, setUpdatedStartDate] = useState('');
+  const [updatedPayRate, setUpdatedPayRate] = useState('');
+  const [updatedName, setUpdatedName] = useState('');
+  const [updatedAddress, setUpdatedAddress] = useState('');
   const [updatedEmail, setUpdatedEmail] = useState('');
   const [updatedPhone, setUpdatedPhone] = useState('');
-  const [updatedAddress, setUpdatedAddress] = useState('');
-  const [updatedLoyaltyNumber, setUpdatedLoyaltyNumber] = useState('');
+  const [user, setUser] = useState('')
 
   useEffect(() => {
-    // Fetch data from API
+    const storedUser = JSON.parse(localStorage.getItem('gg_user'));
+    setUser(storedUser);
+
+    const handleStorageChange = () => {
+      const updatedUser = JSON.parse(localStorage.getItem('gg_user'));
+      setUser(updatedUser);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const usersResponse = await fetch('http://localhost:8088/users');
-        const usersData = await usersResponse.json();
-        setUsers(usersData);
-
-        const customersResponse = await fetch('http://localhost:8088/customers');
-        const customersData = await customersResponse.json();
-        setCustomers(customersData);
+        const response = await fetch('http://localhost:8088/employees?_expand=user&_expand=store');
+        const data = await response.json();
+        setEmployees(data);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -31,162 +42,124 @@ export const Customers = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (userId, customerId) => {
-    const user = users.find((user) => user.id === userId);
-    setEditedUser(user);
-    setUpdatedFullName(user.fullName);
-    setUpdatedEmail(user.email);
-    setUpdatedPhone(user.phone);
-    setUpdatedAddress(user.streetAddress);
-
-    const customer = customers.find((customer) => customer.id === customerId);
-    setEditedCustomer(customer);
-    setUpdatedLoyaltyNumber(customer.loyaltyNumber);
+  const handleEdit = (employeeId) => {
+    const employee = employees.find((employee) => employee.id === employeeId);
+    setEditedEmployee(employee);
+    setUpdatedStartDate(employee.startDate);
+    setUpdatedPayRate(employee.payRate);
   };
 
-  const handleSave = async (userId) => {
-    const updatedUser = {
-      ...editedUser,
-      fullName: updatedFullName,
-      email: updatedEmail,
-      phone: updatedPhone,
-      streetAddress: updatedAddress,
+  const handleSave = async (employeeId) => {
+    const updatedEmployee = {
+      ...editedEmployee,
+      startDate: updatedStartDate,
+      payRate: parseFloat(updatedPayRate),
     };
 
-    const updatedCustomer = {
-        ...editedCustomer,
-        loyaltyNumber: parseInt(updatedLoyaltyNumber),
-        userId: userId,
-      };
-
-      try {
-        // Update the user data
-        await fetch(`http://localhost:8088/users/${userId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(updatedUser),
-        });
-           
-            // Update the customer data
-      await fetch(`http://localhost:8088/customers/${updatedCustomer.id}`, {
+    try {
+      await fetch(`http://localhost:8088/employees/${employeeId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedCustomer),
+        body: JSON.stringify(updatedEmployee),
       });
 
-          // Refresh the data
-      const updatedUsers = users.map((user) => (user.id === userId ? updatedUser : user));
-      setUsers(updatedUsers);
-
-      const updatedCustomers = customers.map((customer) =>
-        customer.id === updatedCustomer.id ? updatedCustomer : customer
+      const updatedEmployees = employees.map((employee) =>
+        employee.id === employeeId ? updatedEmployee : employee
       );
-      setCustomers(updatedCustomers);
+      setEmployees(updatedEmployees);
 
-      setEditedUser(null);
-      setEditedCustomer(null);
+      setEditedEmployee(null);
 
       window.alert('Changes saved!');
     } catch (error) {
-      console.error('Error updating customer:', error);
+      console.error('Error updating employee:', error);
     }
   };
 
-  const handleDelete = async (userId) => {
-    try {
-      await fetch(`http://localhost:8088/users/${userId}`, {
-        method: 'DELETE',
-      });
-
-      const updatedUsers = users.filter((user) => user.id !== userId);
-      setUsers(updatedUsers);
-
-      // Remove the customer with matching userId from the customers array
-      const updatedCustomers = customers.filter((customer) => customer.userId !== userId);
-      setCustomers(updatedCustomers);
-
-      window.alert('Customer deleted!');
-    } catch (error) {
-      console.error('Error deleting customer:', error);
-    }
-  };
+  const isEmployee = user?.isStaff;
 
   return (
     <div>
-      {/* Customer list */}
-      {customers.map((customer) => {
-        const user = users.find((user) => user.id === customer.userId);
-
-        return (
-          <div key={customer.id}>
-            <h2>{customer.fullName}</h2>
-            {user && (
-              <>
-                <p>Name: {user.fullName}</p>
-                <p>Email: {user.email}</p>
-                <p>Phone: {user.phone}</p>
-                <p>Address: {user.streetAddress}</p>
-              </>
-            )}
-            <p>Loyalty Number: {customer.loyaltyNumber}</p>
-
-            {/* Edit and Delete buttons */}
-            {editedUser && editedUser.id === customer.userId ? (
-              <div>
-                <input
-                  type="text"
-                  placeholder="Enter full name"
-                  value={updatedFullName}
-                  onChange={(e) => setUpdatedFullName(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Enter email"
-                  value={updatedEmail}
-                  onChange={(e) => setUpdatedEmail(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Enter phone"
-                  value={updatedPhone}
-                  onChange={(e) => setUpdatedPhone(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Enter address"
-                  value={updatedAddress}
-                  onChange={(e) => setUpdatedAddress(e.target.value)}
-                />
-                <input
-                  type="text"
-                  placeholder="Enter loyalty number"
-                  value={updatedLoyaltyNumber}
-                  onChange={(e) => setUpdatedLoyaltyNumber(e.target.value)}
-                />
-                <button className="action-button" onClick={() => handleSave(customer.userId)}>
-                  Save
-                </button>
-                <button className="action-button" onClick={() => setEditedUser(null)}>
-                  Cancel
-                </button>
+      {isEmployee && (
+        <div className="object-list">
+          <h1>Employees</h1>
+          {employees.map((employee) => {
+            const user = employee.user;
+  
+            return (
+              <div key={employee.id} className="object-item">
+                <div className="object-details">
+                  <h2>{user.fullName}</h2>
+                  {user && (
+                    <>
+                      <p>Name: {user.fullName}</p>
+                      <p>Store Location: {employee.store && employee.store.storeName}</p>
+                    </>
+                  )}
+  
+                  {/* Edit and Cancel buttons */}
+                  {isEmployee && editedEmployee && editedEmployee.id === employee.id ? (
+                    <div className="edit-object">
+                      <input
+                        type="text"
+                        id="employeeName"
+                        value={user.fullName}
+                        onChange={(e) => setUpdatedName(e.target.value)}
+                      />
+                      <input
+                        type="email"
+                        id="employeeEmail"
+                        value={user.email}
+                        onChange={(e) => setUpdatedEmail(e.target.value)}
+                      />
+                      <input
+                        type="phone"
+                        id="employeePhone"
+                        value={user.phone}
+                        onChange={(e) => setUpdatedPhone(e.target.value)}
+                      />
+                      <input
+                        type="address"
+                        id="employeeAddress"
+                        value={user.streetAddress}
+                        onChange={(e) => setUpdatedAddress(e.target.value)}
+                      />
+                      <input
+                        type="date"
+                        id="startDate"
+                        value={employee.startDate}
+                        onChange={(e) => setUpdatedStartDate(e.target.value)}
+                      />
+                      <input
+                        type="number"
+                        step="0.01"
+                        id="payRate"
+                        value={employee.payRate.toFixed(2)}
+                        onChange={(e) => setUpdatedPayRate(e.target.value)}
+                      />
+                      <button className="action-button" onClick={() => handleSave(employee.id)}>
+                        Save
+                      </button>
+                      <button className="action-button" onClick={() => setEditedEmployee(null)}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <div>
+                      <button className="action-button" onClick={() => handleEdit(employee.id)}>
+                        View/Edit Details
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            ) : (
-              <div>
-                <button className="action-button" onClick={() => handleEdit(customer.userId, customer.id)}>
-                  Edit
-                </button>
-                <button className="action-button" onClick={() => handleDelete(customer.userId)}>
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
-        );
-      })}
+            );
+          })}
+        </div>
+      )}
     </div>
   );
+  
 };
