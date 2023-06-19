@@ -8,7 +8,9 @@ export const GameForm = ({ nextId }) => {
   const [categoryId, setCategoryId] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
-  const [quantity, setQuantity] = useState('');
+  const [stores, setStores] = useState([]);
+  const [selectedStores, setSelectedStores] = useState([]);
+  const [storeQuantities, setStoreQuantities] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
 
@@ -28,8 +30,16 @@ export const GameForm = ({ nextId }) => {
     setImageUrl(event.target.value);
   };
 
-  const handleQuantityChange = (event) => {
-    setQuantity(event.target.value);
+  const handleStoreChange = (event) => {
+    const selectedStoreIds = Array.from(event.target.selectedOptions, (option) =>
+      parseInt(option.value)
+    );
+    setSelectedStores(selectedStoreIds);
+  };
+
+  const handleStoreQuantityChange = (event, storeId) => {
+    const updatedQuantities = { ...storeQuantities, [storeId]: parseInt(event.target.value) };
+    setStoreQuantities(updatedQuantities);
   };
 
   const handleSubmit = async (event) => {
@@ -43,7 +53,6 @@ export const GameForm = ({ nextId }) => {
       categoryId: parseInt(categoryId),
       price: parseFloat(price),
       imageUrl: imageUrl,
-      quantity: parseInt(quantity),
     };
 
     try {
@@ -56,6 +65,30 @@ export const GameForm = ({ nextId }) => {
       });
 
       if (response.ok) {
+        // Get the newly created game's ID
+        const data = await response.json();
+        const gameId = data.id;
+
+        // Create an array of game-store quantity objects
+        const gameStoreQuantities = selectedStores.map((storeId) => ({
+          gameId: gameId,
+          storeId: storeId,
+          quantity: storeQuantities[storeId] || 0,
+        }));
+
+        // Add game-store quantity objects to the games_in_stores array
+        await Promise.all(
+          gameStoreQuantities.map((gameStoreQuantity) =>
+            fetch('http://localhost:8088/games_in_stores', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(gameStoreQuantity),
+            })
+          )
+        );
+
         setIsSubmitting(false);
         navigate('/games');
         // Display the alert
@@ -80,7 +113,18 @@ export const GameForm = ({ nextId }) => {
       }
     };
 
+    const fetchStores = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/stores');
+        const data = await response.json();
+        setStores(data);
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+
     fetchCategories();
+    fetchStores();
   }, []);
 
   return (
@@ -141,17 +185,36 @@ export const GameForm = ({ nextId }) => {
           />
         </div>
         <div>
-          <label htmlFor="quantity">Quantity:</label>
-          <input
-            type="number"
-            id="quantity"
-            className="games-form-input"
-            placeholder="0"
-            value={quantity}
-            onChange={handleQuantityChange}
+          <label htmlFor="stores">Available in Stores (Ctrl-click to select multiple):</label>
+          <select
+            id="stores"
+            className="games-form-select"
+            multiple
+            value={selectedStores}
+            onChange={handleStoreChange}
             required
-          />
+          >
+            {stores.map((store) => (
+              <option key={store.id} value={store.id}>
+                {store.storeName}
+              </option>
+            ))}
+          </select>
         </div>
+        {selectedStores.map((storeId) => (
+          <div key={storeId}>
+            <label htmlFor={`quantity-${storeId}`}>Quantity at Store {storeId}:</label>
+            <input
+              type="number"
+              id={`quantity-${storeId}`}
+              className="games-form-input"
+              placeholder="0"
+              value={storeQuantities[storeId] || ''}
+              onChange={(event) => handleStoreQuantityChange(event, storeId)}
+              required
+            />
+          </div>
+        ))}
         <button
           type="submit"
           disabled={isSubmitting}

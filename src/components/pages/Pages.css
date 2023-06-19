@@ -319,12 +319,12 @@ p {
 }
 
 .game img {
-  width: 100px; /* Adjust the size as needed */
-  margin-right: 10px; /* Add spacing between the image and details */
+  width: 100px; 
+  margin-right: 10px; 
 }
 
 .game-details {
-  flex-grow: 1; /* Allow the details to expand and fill the remaining space */
+  flex-grow: 1; 
 }
 
 /* Store Form Styling */
