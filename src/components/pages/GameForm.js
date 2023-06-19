@@ -42,6 +42,15 @@ export const GameForm = ({ nextId }) => {
     setStoreQuantities(updatedQuantities);
   };
 
+  const resetForm = () => {
+    setGameTitle('');
+    setCategoryId('');
+    setPrice('');
+    setImageUrl('');
+    setSelectedStores([]);
+    setStoreQuantities([]);
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -93,14 +102,15 @@ export const GameForm = ({ nextId }) => {
         navigate('/games');
         // Display the alert
         window.alert('Game added!');
-      } else {
-        throw new Error('Error adding game');
-      }
-    } catch (error) {
-      setIsSubmitting(false);
-      console.error('Error adding game:', error);
+      resetForm(); // Reset the form after successful submission
+    } else {
+      throw new Error('Error adding game');
     }
-  };
+  } catch (error) {
+    setIsSubmitting(false);
+    console.error('Error adding game:', error);
+  }
+};
 
   useEffect(() => {
     const fetchCategories = async () => {

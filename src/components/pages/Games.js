@@ -13,6 +13,7 @@ export const Games = () => {
   const [updatedQuantity, setUpdatedQuantity] = useState('');
   const [categories, setCategories] = useState([]);
   const [gamesInStores, setGamesInStores] = useState([]);
+  const [stores, setStores] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -70,6 +71,20 @@ export const Games = () => {
     };
 
     fetchGamesInStores();
+  }, []);
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/stores'); // Replace with the actual API endpoint for stores
+        const data = await response.json();
+        setStores(data);
+      } catch (error) {
+        console.error('Error fetching stores:', error);
+      }
+    };
+
+    fetchStores();
   }, []);
 
   const handleEdit = (gameId) => {
@@ -149,13 +164,14 @@ export const Games = () => {
         </div>
       )}
 
-      <div className="object-list">
+<div className="object-list">
         <h1>Games</h1>
         {games.map(({ id, gameTitle, categoryId, price, imageUrl }) => {
           const category = categories.find((category) => category.id === categoryId);
           const categoryName = category ? category.categoryName : 'Unknown Category';
           const gameInStore = gamesInStores.find((gameInStore) => gameInStore.gameId === id);
           const quantity = gameInStore ? gameInStore.quantity : 0;
+          const gameStores = gamesInStores.filter((gameInStore) => gameInStore.gameId === id);
 
           return (
             <div key={id} className="object-item">
@@ -163,7 +179,24 @@ export const Games = () => {
               <h2>{gameTitle}</h2>
               <p>Category: {categoryName}</p>
               <p>Price: ${price}</p>
-              <p>In Stock: {quantity}</p>
+              <p>Available at:</p>
+                {gameStores.length === 0 ? (
+                  <p>Not available in any store</p>
+                ) : (
+                  <ul>
+                    {gameStores.map((gameStore) => {
+                      const store = stores.find((store) => store.id === gameStore.storeId);
+                      const storeQuantity = gameStore.quantity;
+
+                      return (
+                        <li key={store.id}>
+                          {store.storeName} (In Stock: {storeQuantity})
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+          
 
               {isEmployee && editedGame && editedGame.id === id && (
                 <div className="edit-object">
