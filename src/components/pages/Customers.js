@@ -117,6 +117,32 @@ export const Customers = () => {
     }
   };
 
+  const handleDelete = async (customerId, userId) => {
+    try {
+      // Delete the customer from the /customers endpoint
+      await fetch(`http://localhost:8088/customers/${customerId}`, {
+        method: 'DELETE',
+      });
+
+      // Delete the corresponding user from the /users endpoint
+      await fetch(`http://localhost:8088/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      // Remove the deleted customer from the state
+      const updatedCustomers = customers.filter((customer) => customer.id !== customerId);
+      setCustomers(updatedCustomers);
+
+      // Remove the deleted user from the state
+      const updatedUsers = users.filter((user) => user.id !== userId);
+      setUsers(updatedUsers);
+
+      window.alert('Customer deleted!');
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+    }
+  };
+
   const isEmployee = user?.isStaff;
 
   return (
@@ -126,7 +152,7 @@ export const Customers = () => {
           <h1>Customers</h1>
           {customers.map((customer) => {
             const user = users.find((user) => user.id === customer.userId);
-  
+
             return (
               <div key={customer.id} className="object-item">
                 <div className="object-details">
@@ -137,7 +163,7 @@ export const Customers = () => {
                     </>
                   )}
                   <p>Loyalty Number: {customer.loyaltyNumber}</p>
-  
+
                   {/* Edit and Delete buttons */}
                   {isEmployee && editedUser && editedUser.id === user.id ? (
                     <div className="edit-object">
@@ -186,6 +212,12 @@ export const Customers = () => {
                       >
                         View/Edit Details
                       </button>
+                      <button
+                        className="action-button"
+                        onClick={() => handleDelete(customer.id, user.id)}
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </div>
@@ -195,5 +227,6 @@ export const Customers = () => {
         </div>
       )}
     </div>
-  )};
-  
+  )
+};
+
