@@ -160,6 +160,9 @@ export const Customers = () => {
                   {user && (
                     <>
                       <p>Name: {user.fullName}</p>
+                      <p>Email: {user.email}</p>
+                      <p>Phone: {user.phone}</p>
+                      <p>Address: {user.streetAddress}</p>
                     </>
                   )}
                   <p>Loyalty Number: {customer.loyaltyNumber}</p>
