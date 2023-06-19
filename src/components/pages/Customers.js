@@ -30,7 +30,6 @@ export const Customers = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch data from API
     const fetchData = async () => {
       try {
         const response = await fetch('http://localhost:8088/customers?_expand=user');

@@ -2,16 +2,18 @@ import React, { useEffect, useState } from 'react';
 import './Pages.css';
 
 export const Employees = () => {
+  const [users, setUsers] = useState([]);
+  const [user, setUser] = useState([])
   const [employees, setEmployees] = useState([]);
+  const [editedUser, setEditedUser] = useState(null);
   const [editedEmployee, setEditedEmployee] = useState(null);
-  const [updatedStartDate, setUpdatedStartDate] = useState('');
-  const [updatedPayRate, setUpdatedPayRate] = useState('');
-  const [updatedName, setUpdatedName] = useState('');
-  const [updatedAddress, setUpdatedAddress] = useState('');
+  const [updatedFullName, setUpdatedFullName] = useState('');
   const [updatedEmail, setUpdatedEmail] = useState('');
   const [updatedPhone, setUpdatedPhone] = useState('');
-  const [user, setUser] = useState('')
-  const [users, setUsers] = useState('')
+  const [updatedAddress, setUpdatedAddress] = useState('');
+  const [updatedStartDate, setUpdatedStartDate] = useState('');
+  const [updatedPayRate, setUpdatedPayRate] = useState('');
+  const [updatedEmployee, setUpdatedEmployee] = useState(null);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -28,13 +30,22 @@ export const Employees = () => {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
-
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8088/employees?_expand=user&_expand=store');
+        const response = await fetch('http://localhost:8088/employees?_expand=user');
         const data = await response.json();
-        setEmployees(data);
+
+        // Separate users and employees data
+        const usersData = data.map((item) => item.user);
+        const employeesData = data.map((item) => ({
+          ...item,
+          user: undefined, // Remove user data from employees array
+        }));
+
+        setUsers(usersData);
+        setEmployees(employeesData);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -43,34 +54,64 @@ export const Employees = () => {
     fetchData();
   }, []);
 
-  const handleEdit = (employeeId) => {
+  const handleEdit = (userId, employeeId) => {
+    const user = users.find((user) => user.id === userId);
+    setEditedUser(user);
+    setUpdatedFullName(user.fullName);
+    setUpdatedEmail(user.email);
+    setUpdatedPhone(user.phone);
+    setUpdatedAddress(user.streetAddress);
+
     const employee = employees.find((employee) => employee.id === employeeId);
     setEditedEmployee(employee);
     setUpdatedStartDate(employee.startDate);
     setUpdatedPayRate(employee.payRate);
   };
 
-  const handleSave = async (employeeId) => {
-    const updatedEmployee = {
+  const handleSave = async (userId) => {
+    const updatedUser = {
+      ...editedUser,
+      fullName: updatedFullName,
+      email: updatedEmail,
+      phone: updatedPhone,
+      streetAddress: updatedAddress,
+    };
+
+    const updatedEmployeeData = {
       ...editedEmployee,
       startDate: updatedStartDate,
-      payRate: parseFloat(updatedPayRate),
+      payRate: parseInt(updatedPayRate),
     };
 
     try {
-      await fetch(`http://localhost:8088/employees/${employeeId}`, {
+      // Update the user data
+      await fetch(`http://localhost:8088/users/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedEmployee),
+        body: JSON.stringify(updatedUser),
       });
 
+      // Update the employee data
+      await fetch(`http://localhost:8088/employees/${updatedEmployee.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedEmployeeData),
+    });
+
+      // Refresh the data
+      const updatedUsers = users.map((user) => (user.id === userId ? updatedUser : user));
+      setUsers(updatedUsers);
+
       const updatedEmployees = employees.map((employee) =>
-        employee.id === employeeId ? updatedEmployee : employee
+        employee.id === updatedEmployee.id ? updatedEmployee : employee
       );
       setEmployees(updatedEmployees);
 
+      setEditedUser(null);
       setEditedEmployee(null);
 
       window.alert('Changes saved!');
@@ -105,7 +146,7 @@ export const Employees = () => {
     }
   };
 
-  const isEmployee = user?.isStaff;
+  const isEmployee = true;
 
   return (
     <div>
@@ -113,7 +154,7 @@ export const Employees = () => {
         <div className="object-list">
           <h1>Employees</h1>
           {employees.map((employee) => {
-            const user = employee.user;
+            const user = users.find((user) => user.id === employee.userId);
 
             return (
               <div key={employee.id} className="object-item">
@@ -122,60 +163,66 @@ export const Employees = () => {
                   {user && (
                     <>
                       <p>Name: {user.fullName}</p>
-                      <p>Store Location: {employee.store && employee.store.storeName}</p>
+                      <p>Email: {user.email}</p>
+                      <p>Phone: {user.phone}</p>
+                      <p>Address: {user.streetAddress}</p>
                     </>
                   )}
+                  <p>Start Date: {employee.startDate}</p>
+                  <p>Pay Rate: ${employee.payRate.toFixed(2)}</p>
 
-                  {/* Edit and Cancel buttons */}
-                  {isEmployee && editedEmployee && editedEmployee.id === employee.id ? (
+                  {/* Edit and Delete buttons */}
+                  {isEmployee && editedUser && editedUser.id === user.id ? (
                     <div className="edit-object">
                       <input
                         type="text"
                         id="employeeName"
                         value={user.fullName}
-                        onChange={(e) => setUpdatedName(e.target.value)}
+                        onChange={(e) => setUpdatedFullName(e.target.value)}
                       />
                       <input
-                        type="email"
+                        type="text"
                         id="employeeEmail"
                         value={user.email}
                         onChange={(e) => setUpdatedEmail(e.target.value)}
                       />
                       <input
-                        type="phone"
+                        type="text"
                         id="employeePhone"
                         value={user.phone}
                         onChange={(e) => setUpdatedPhone(e.target.value)}
                       />
                       <input
-                        type="address"
+                        type="text"
                         id="employeeAddress"
                         value={user.streetAddress}
                         onChange={(e) => setUpdatedAddress(e.target.value)}
                       />
                       <input
-                        type="date"
+                        type="text"
                         id="startDate"
                         value={employee.startDate}
                         onChange={(e) => setUpdatedStartDate(e.target.value)}
                       />
                       <input
-                        type="number"
-                        step="0.01"
+                        type="text"
                         id="payRate"
-                        value={employee.payRate.toFixed(2)}
+                        value={employee.payRate}
                         onChange={(e) => setUpdatedPayRate(e.target.value)}
                       />
-                      <button className="action-button" onClick={() => handleSave(employee.id)}>
+                      <button className="action-button" onClick={() => handleSave(user.id)}>
                         Save
                       </button>
-                      <button className="action-button" onClick={() => setEditedEmployee(null)}>
+                      <button className="action-button" onClick={() => setEditedUser(null)}>
                         Cancel
                       </button>
                     </div>
                   ) : (
                     <div>
-                      <button className="action-button" onClick={() => handleEdit(employee.id)}>
+                      <button
+                        className="action-button"
+                        onClick={() => handleEdit(user.id, employee.id)}
+                      >
                         View/Edit Details
                       </button>
                       <button
@@ -184,7 +231,6 @@ export const Employees = () => {
                       >
                         Delete
                       </button>
-
                     </div>
                   )}
                 </div>
@@ -195,5 +241,4 @@ export const Employees = () => {
       )}
     </div>
   );
-
 };
