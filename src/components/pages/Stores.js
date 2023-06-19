@@ -11,7 +11,8 @@ export const Stores = () => {
   const [updatedAddress, setUpdatedAddress] = useState('');
   const [updatedPhone, setUpdatedPhone] = useState('');
   const [nextId, setNextId] = useState(0);
- const [updatedHours, setUpdatedHours] = useState('');
+  const [updatedHours, setUpdatedHours] = useState('');
+  const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -42,6 +43,20 @@ export const Stores = () => {
     };
 
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/employees');
+        const data = await response.json();
+        setEmployees(data);
+      } catch (error) {
+        console.error('Error fetching employees:', error);
+      }
+    };
+  
+    fetchEmployees();
   }, []);
 
   const handleEdit = (storeId) => {
@@ -82,6 +97,31 @@ export const Stores = () => {
     }
   };
 
+  const handleDelete = async (storeId) => {
+    // Filter out any associated employees from the employees state
+    const updatedEmployees = employees.filter((employee) => employee.storeId !== storeId);
+    setEmployees(updatedEmployees);
+  
+    // Optional: Notify the user that associated employees were not deleted
+  
+    try {
+      // Delete the store
+      await fetch(`http://localhost:8088/stores/${storeId}`, {
+        method: 'DELETE',
+      });
+  
+      // Filter out the deleted store from the stores state
+      const updatedStores = stores.filter((store) => store.id !== storeId);
+      setStores(updatedStores);
+  
+      // Optional: Notify the user that the store was deleted
+  
+      window.alert('Store deleted!');
+    } catch (error) {
+      console.error('Error deleting store:', error);
+    }
+  };  
+
   const isEmployee = user?.isStaff;
 
   return (
@@ -91,7 +131,7 @@ export const Stores = () => {
           <StoreForm nextId={nextId} />
         </div>
       )}
-  
+
       <div className="object-list">
         <h1>Stores</h1>
         {stores.map(({ id, storeName, storeAddress, storePhone, storeHours }) => (
@@ -102,7 +142,7 @@ export const Stores = () => {
               <p>Phone: {storePhone}</p>
               <p>Store Hours: {storeHours}</p>
             </div>
-  
+
             {isEmployee && editedStore && editedStore.id === id && (
               <div className="edit-object">
                 <input
@@ -123,7 +163,7 @@ export const Stores = () => {
                   value={storePhone}
                   onChange={(e) => setUpdatedPhone(e.target.value)}
                 />
-  
+
                 <button className="action-button" onClick={() => handleSave(id)}>
                   Save
                 </button>
@@ -132,16 +172,20 @@ export const Stores = () => {
                 </button>
               </div>
             )}
-  
-  {isEmployee && !editedStore && (
-  <div>
-    <button className="action-button" onClick={() => handleEdit(id)}>
-      View/Edit Details
-    </button>
-            </div>
-          )}
-        </div>
-      ))}
+
+            {isEmployee && !editedStore && (
+              <div>
+                <button className="action-button" onClick={() => handleEdit(id)}>
+                  View/Edit Details
+                </button>
+                <button className="action-button" onClick={() => handleDelete(id)}>
+                  Delete
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
-)};
+  )
+};

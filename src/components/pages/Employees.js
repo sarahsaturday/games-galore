@@ -11,6 +11,7 @@ export const Employees = () => {
   const [updatedEmail, setUpdatedEmail] = useState('');
   const [updatedPhone, setUpdatedPhone] = useState('');
   const [user, setUser] = useState('')
+  const [users, setUsers] = useState('')
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -78,6 +79,32 @@ export const Employees = () => {
     }
   };
 
+  const handleDelete = async (employeeId, userId) => {
+    try {
+      // Delete the employee from the /employees endpoint
+      await fetch(`http://localhost:8088/employees/${employeeId}`, {
+        method: 'DELETE',
+      });
+
+      // Delete the corresponding user from the /users endpoint
+      await fetch(`http://localhost:8088/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      // Remove the deleted employee from the state
+      const updatedEmployees = employees.filter((employee) => employee.id !== employeeId);
+      setEmployees(updatedEmployees);
+
+      // Remove the deleted user from the state
+      const updatedUsers = users.filter((user) => user.id !== userId);
+      setUsers(updatedUsers);
+
+      window.alert('Employee deleted!');
+    } catch (error) {
+      console.error('Error deleting employee:', error);
+    }
+  };
+
   const isEmployee = user?.isStaff;
 
   return (
@@ -87,7 +114,7 @@ export const Employees = () => {
           <h1>Employees</h1>
           {employees.map((employee) => {
             const user = employee.user;
-  
+
             return (
               <div key={employee.id} className="object-item">
                 <div className="object-details">
@@ -98,7 +125,7 @@ export const Employees = () => {
                       <p>Store Location: {employee.store && employee.store.storeName}</p>
                     </>
                   )}
-  
+
                   {/* Edit and Cancel buttons */}
                   {isEmployee && editedEmployee && editedEmployee.id === employee.id ? (
                     <div className="edit-object">
@@ -151,6 +178,13 @@ export const Employees = () => {
                       <button className="action-button" onClick={() => handleEdit(employee.id)}>
                         View/Edit Details
                       </button>
+                      <button
+                        className="action-button"
+                        onClick={() => handleDelete(employee.id, user.id)}
+                      >
+                        Delete
+                      </button>
+
                     </div>
                   )}
                 </div>
@@ -161,5 +195,5 @@ export const Employees = () => {
       )}
     </div>
   );
-  
+
 };

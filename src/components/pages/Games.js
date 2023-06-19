@@ -11,6 +11,8 @@ export const Games = () => {
   const [updatedCategoryId, setUpdatedCategoryId] = useState('');
   const [updatedPrice, setUpdatedPrice] = useState('');
   const [updatedQuantity, setUpdatedQuantity] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [gamesInStores, setGamesInStores] = useState([]);
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -33,23 +35,51 @@ export const Games = () => {
       try {
         const response = await fetch('http://localhost:8088/games');
         const data = await response.json();
-
         setGames(data);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching games:', error);
       }
     };
 
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/categories');
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchGamesInStores = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/games_in_stores');
+        const data = await response.json();
+        setGamesInStores(data);
+      } catch (error) {
+        console.error('Error fetching games in stores:', error);
+      }
+    };
+
+    fetchGamesInStores();
+  }, []);
+
   const handleEdit = (gameId) => {
     const game = games.find((game) => game.id === gameId);
+    const gameInStore = gamesInStores.find((gameInStore) => gameInStore.gameId === gameId);
     setEditedGame(game);
     setUpdatedGameTitle(game.gameTitle);
     setUpdatedCategoryId(game.categoryId);
     setUpdatedPrice(game.price);
-    setUpdatedQuantity(game.quantity);
+    setUpdatedQuantity(gameInStore ? gameInStore.quantity : 0);
   };
 
   const handleSave = async (gameId) => {
@@ -58,6 +88,10 @@ export const Games = () => {
       gameTitle: updatedGameTitle,
       categoryId: updatedCategoryId,
       price: parseFloat(updatedPrice),
+    };
+
+    const updatedGameInStore = {
+      gameId: gameId,
       quantity: updatedQuantity,
     };
 
@@ -68,6 +102,14 @@ export const Games = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(updatedGame),
+      });
+
+      await fetch(`http://localhost:8088/games_in_stores/${gameId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedGameInStore),
       });
 
       const updatedGames = games.map((game) => (game.id === gameId ? updatedGame : game));
@@ -81,6 +123,22 @@ export const Games = () => {
     }
   };
 
+
+  const handleDelete = async (gameId) => {
+    try {
+      await fetch(`http://localhost:8088/games/${gameId}`, {
+        method: 'DELETE',
+      });
+
+      const updatedGames = games.filter((game) => game.id !== gameId);
+      setGames(updatedGames);
+
+      window.alert('Game deleted!');
+    } catch (error) {
+      console.error('Error deleting game:', error);
+    }
+  };
+
   const isEmployee = user?.isStaff;
 
   return (
@@ -90,18 +148,23 @@ export const Games = () => {
           <GameForm />
         </div>
       )}
-  
+
       <div className="object-list">
         <h1>Games</h1>
-        {games.map(({ id, gameTitle, categoryId, price, imageUrl, quantity }) => {
+        {games.map(({ id, gameTitle, categoryId, price, imageUrl }) => {
+          const category = categories.find((category) => category.id === categoryId);
+          const categoryName = category ? category.categoryName : 'Unknown Category';
+          const gameInStore = gamesInStores.find((gameInStore) => gameInStore.gameId === id);
+          const quantity = gameInStore ? gameInStore.quantity : 0;
+
           return (
             <div key={id} className="object-item">
               <img src={imageUrl} alt={gameTitle} style={{ width: '100px' }} />
               <h2>{gameTitle}</h2>
-              <p>Category ID: {categoryId}</p>
+              <p>Category: {categoryName}</p>
               <p>Price: ${price}</p>
               <p>In Stock: {quantity}</p>
-  
+
               {isEmployee && editedGame && editedGame.id === id && (
                 <div className="edit-object">
                   <input
@@ -136,11 +199,19 @@ export const Games = () => {
                   </button>
                 </div>
               )}
-  
+
               {isEmployee && !editedGame && (
                 <div>
                   <button className="action-button" onClick={() => handleEdit(id)}>
                     Edit
+                  </button>
+                </div>
+              )}
+
+              {isEmployee && (
+                <div>
+                  <button className="action-button" onClick={() => handleDelete(id)}>
+                    Delete
                   </button>
                 </div>
               )}
@@ -150,5 +221,5 @@ export const Games = () => {
       </div>
     </div>
   );
-  
+
 };
