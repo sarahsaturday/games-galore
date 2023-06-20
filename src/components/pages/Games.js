@@ -76,7 +76,7 @@ export const Games = () => {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await fetch('http://localhost:8088/stores'); // Replace with the actual API endpoint for stores
+        const response = await fetch('http://localhost:8088/stores');
         const data = await response.json();
         setStores(data);
       } catch (error) {
@@ -141,10 +141,12 @@ export const Games = () => {
 
   const handleDelete = async (gameId) => {
     try {
+      // Delete the game from the /games endpoint
       await fetch(`http://localhost:8088/games/${gameId}`, {
         method: 'DELETE',
       });
 
+      // Remove the deleted game from the state
       const updatedGames = games.filter((game) => game.id !== gameId);
       setGames(updatedGames);
 
@@ -153,6 +155,7 @@ export const Games = () => {
       console.error('Error deleting game:', error);
     }
   };
+  
 
   const isEmployee = user?.isStaff;
 
@@ -164,7 +167,7 @@ export const Games = () => {
         </div>
       )}
 
-<div className="object-list">
+      <div className="object-list">
         <h1>Games</h1>
         {games.map(({ id, gameTitle, categoryId, price, imageUrl }) => {
           const category = categories.find((category) => category.id === categoryId);
@@ -180,23 +183,26 @@ export const Games = () => {
               <p>Category: {categoryName}</p>
               <p>Price: ${price}</p>
               <p>Available at:</p>
-                {gameStores.length === 0 ? (
-                  <p>Not available in any store</p>
-                ) : (
-                  <ul>
-                    {gameStores.map((gameStore) => {
-                      const store = stores.find((store) => store.id === gameStore.storeId);
-                      const storeQuantity = gameStore.quantity;
+              {gameStores.length === 0 ? (
+                <p>Not available in any store</p>
+              ) : (
+                gameStores.map((gameStore) => {
+                  const store = stores.find((store) => store.id === gameStore.storeId);
+                  const storeQuantity = gameStore.quantity;
 
-                      return (
-                        <li key={store.id}>
-                          {store.storeName} (In Stock: {storeQuantity})
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-          
+                  if (!store) {
+                    return null; // Skip rendering if store is not available yet
+                  }
+
+                  return (
+                    <p><span key={store.id}>
+                      {store.storeName} (In Stock: {storeQuantity})
+                    </span>
+                    </p>
+                  );
+                })
+              )}
+
 
               {isEmployee && editedGame && editedGame.id === id && (
                 <div className="edit-object">

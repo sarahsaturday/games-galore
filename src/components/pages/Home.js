@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import './Pages.css';
-
 
 export const Home = () => {
   const [recentGames, setRecentGames] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const navigate = useNavigate();
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
     const fetchRecentGames = async () => {
@@ -25,6 +23,7 @@ export const Home = () => {
         });
 
         setRecentGames(recentGames);
+        setPageLoaded(true);
       } catch (error) {
         console.error('Error fetching recent games:', error);
       }
@@ -54,6 +53,10 @@ export const Home = () => {
     }
   }, [searchQuery]);
 
+  useEffect(() => {
+    setPageLoaded(false);
+  }, [searchQuery]);
+
   const handleSearchChange = (event) => {
     const { value } = event.target;
     setSearchQuery(value);
@@ -61,21 +64,20 @@ export const Home = () => {
 
   const fetchSearchResults = async () => {
     try {
+      setIsSearching(true);
       const gamesResponse = await fetch('http://localhost:8088/games?_expand=category');
       const gamesData = await gamesResponse.json();
-  
+
       const storesResponse = await fetch('http://localhost:8088/stores');
       const storesData = await storesResponse.json();
-  
+
       const filteredResults = gamesData.filter(
         (game) =>
           game.gameTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
           game.category.categoryName.toLowerCase() === searchQuery.toLowerCase() ||
-          game.storeId.some((storeId) =>
-            storeId.toString().includes(searchQuery.toLowerCase())
-          )
+          game.storeId.some((storeId) => storeId.toString().includes(searchQuery.toLowerCase()))
       );
-  
+
       const resultsWithStores = filteredResults.map((game) => {
         const stores = game.storeId.map((storeId) => {
           const store = storesData.find((store) => store.id === storeId);
@@ -88,7 +90,7 @@ export const Home = () => {
           stores: stores.filter((store) => store !== null),
         };
       });
-  
+
       setSearchResults(resultsWithStores);
       setIsSearching(false);
     } catch (error) {
@@ -96,9 +98,47 @@ export const Home = () => {
       setIsSearching(false);
     }
   };
+
+  const renderSearchResults = () => {
+    if (isSearching) {
+      return <p>Loading...</p>;
+    } else if (searchResults.length > 0) {
+      return (
+        <div>
+          <ul>
+            {searchResults.map((game, index) => (
+              <li key={index}>
+                <b>{game.gameTitle}</b>
+                <p>Price: {game.price}</p>
+                <p>Category: {game.category}</p>
+                {game.stores.map((store, storeIndex) => (
+                  <p key={storeIndex}>Store Location: {store}</p>
+                ))}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+    // Remove the else block to prevent the "No Results" message from being displayed initially
+    return null;
+  };
   
+  const renderSlideshow = () => {
+    if (!pageLoaded) {
+      return null;
+    }
 
-
+    return (
+      <Carousel autoPlay interval={3000} infiniteLoop showThumbs={false}>
+        {recentGames.map((game, index) => (
+          <div key={index}>
+            <img src={game.imageUrl} alt={game.gameTitle} />
+          </div>
+        ))}
+      </Carousel>
+    );
+  };
 
   return (
     <div>
@@ -113,43 +153,13 @@ export const Home = () => {
           />
         </form>
         {/* Render the search results */}
-        {isSearching ? (
-          <p>Loading...</p>
-        ) : (
-          <div>
-  {isSearching ? (
-  <p>Loading...</p>
-  ) : searchResults.length >= 0 ? (
-    <div>
-      <ul>
-      {searchResults.map((game, index) => (
-  <li key={index}>
-    <b>{game.gameTitle}</b>
-    <p>Price: {game.price}</p>
-    <p>Category: {game.category}</p>
-    <p>Store Location: {game.storeName}</p>
-  </li>
-))}
-</ul>
-    </div>
-  ) : (
-    <p>No Results</p>
-  )}
-</div>
-        )}
+        {renderSearchResults()}
       </div>
-      
+
       <div className="slideshow-container">
         <h1 className="new-arrivals-heading">New Arrivals</h1>
-        <Carousel autoPlay interval={3000} infiniteLoop showThumbs={false}>
-          {recentGames.map((game, index) => (
-            <div key={index}>
-              <img src={game.imageUrl} alt={game.gameTitle} />
-            </div>
-          ))}
-        </Carousel>
+        {renderSlideshow()}
       </div>
-      
     </div>
   );
 };
