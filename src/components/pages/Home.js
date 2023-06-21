@@ -33,28 +33,68 @@ export const Home = () => {
   }, []);
 
   useEffect(() => {
-    if (searchQuery !== '') {
-      setIsSearching(true);
-      fetch(`http://localhost:8088/games`)
-        .then((response) => response.json())
-        .then((data) => {
-          const filteredResults = data.filter((game) =>
-            game.gameTitle.toLowerCase().includes(searchQuery.toLowerCase())
-          );
-          setSearchResults(filteredResults);
-          setIsSearching(false);
-        })
-        .catch((error) => {
-          console.error(error);
-          setIsSearching(false);
+    const fetchRecentGames = async () => {
+      try {
+        const response = await fetch('http://localhost:8088/games');
+        const data = await response.json();
+
+        const recentGames = data.filter((game) => {
+          const gameDate = new Date(game.dateEntered);
+          const cutoffDate = new Date('2019-01-01');
+          return gameDate > cutoffDate;
         });
+
+        setRecentGames(recentGames);
+        setPageLoaded(true);
+      } catch (error) {
+        console.error('Error fetching recent games:', error);
+      }
+    };
+
+    fetchRecentGames();
+  }, []);
+
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      try {
+        setIsSearching(true);
+        const gamesResponse = await fetch('http://localhost:8088/games?_expand=category');
+        const gamesData = await gamesResponse.json();
+    
+        const storesResponse = await fetch('http://localhost:8088/stores');
+        const storesData = await storesResponse.json();
+    
+        const gamesInStoresResponse = await fetch('http://localhost:8088/games_in_stores');
+        const gamesInStoresData = await gamesInStoresResponse.json();
+    
+        const filteredResults = gamesData.filter(
+          (game) => game.gameTitle.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+
+        const resultsWithStores = filteredResults.map((game) => {
+          const gameInStore = gamesInStoresData.find((gis) => gis.gameId === game.id);
+          const store = storesData.find((store) => store.id === gameInStore.storeId);
+          return {
+            gameTitle: game.gameTitle,
+            price: game.price,
+            category: game.category.categoryName,
+            stores: store ? [store.storeName] : [],
+          };
+        });
+    
+        setSearchResults(resultsWithStores);
+        setIsSearching(false);
+      } catch (error) {
+        console.error(error);
+        setIsSearching(false);
+      }
+    };
+
+    if (searchQuery !== '') {
+      fetchSearchResults();
     } else {
       setSearchResults([]);
     }
-  }, [searchQuery]);
-
-  useEffect(() => {
-    setPageLoaded(false);
   }, [searchQuery]);
 
   const handleSearchChange = (event) => {
@@ -62,47 +102,10 @@ export const Home = () => {
     setSearchQuery(value);
   };
 
-  const fetchSearchResults = async () => {
-    try {
-      setIsSearching(true);
-      const gamesResponse = await fetch('http://localhost:8088/games?_expand=category');
-      const gamesData = await gamesResponse.json();
-
-      const storesResponse = await fetch('http://localhost:8088/stores');
-      const storesData = await storesResponse.json();
-
-      const filteredResults = gamesData.filter(
-        (game) =>
-          game.gameTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          game.category.categoryName.toLowerCase() === searchQuery.toLowerCase() ||
-          game.storeId.some((storeId) => storeId.toString().includes(searchQuery.toLowerCase()))
-      );
-
-      const resultsWithStores = filteredResults.map((game) => {
-        const stores = game.storeId.map((storeId) => {
-          const store = storesData.find((store) => store.id === storeId);
-          return store ? store.storeName : null;
-        });
-        return {
-          gameTitle: game.gameTitle,
-          price: game.price,
-          category: game.category.categoryName,
-          stores: stores.filter((store) => store !== null),
-        };
-      });
-
-      setSearchResults(resultsWithStores);
-      setIsSearching(false);
-    } catch (error) {
-      console.error(error);
-      setIsSearching(false);
-    }
-  };
-
   const renderSearchResults = () => {
     if (isSearching) {
       return <p>Loading...</p>;
-    } else if (searchResults.length > 0) {
+    } else if (searchResults && searchResults.length > 0) {
       return (
         <div>
           <ul>
@@ -123,7 +126,7 @@ export const Home = () => {
     // Remove the else block to prevent the "No Results" message from being displayed initially
     return null;
   };
-  
+
   const renderSlideshow = () => {
     if (!pageLoaded) {
       return null;
