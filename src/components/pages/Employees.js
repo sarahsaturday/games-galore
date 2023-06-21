@@ -13,7 +13,7 @@ export const Employees = () => {
   const [updatedAddress, setUpdatedAddress] = useState('');
   const [updatedStartDate, setUpdatedStartDate] = useState('');
   const [updatedPayRate, setUpdatedPayRate] = useState('');
-  const [updatedEmployee, setUpdatedEmployee] = useState(null);
+  const [isEditing, setIsEditing] = useState(null)
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -66,6 +66,8 @@ export const Employees = () => {
     setEditedEmployee(employee);
     setUpdatedStartDate(employee.startDate);
     setUpdatedPayRate(employee.payRate);
+
+    setIsEditing(employee.id); // Enable editing mode
   };
 
   const handleSave = async (userId) => {
@@ -75,9 +77,11 @@ export const Employees = () => {
       email: updatedEmail,
       phone: updatedPhone,
       streetAddress: updatedAddress,
+      isStaff: editedUser.isStaff,
+      isManager: editedUser.isManager,
     };
 
-    const updatedEmployeeData = {
+    const updatedEmployee = {
       ...editedEmployee,
       startDate: updatedStartDate,
       payRate: parseInt(updatedPayRate),
@@ -99,7 +103,7 @@ export const Employees = () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updatedEmployeeData),
+      body: JSON.stringify(updatedEmployee),
     });
 
       // Refresh the data
@@ -109,10 +113,10 @@ export const Employees = () => {
       const updatedEmployees = employees.map((employee) =>
         employee.id === updatedEmployee.id ? updatedEmployee : employee
       );
+      setUsers(updatedUsers);
       setEmployees(updatedEmployees);
 
-      setEditedUser(null);
-      setEditedEmployee(null);
+      setIsEditing(null); // Disable editing mode
 
       window.alert('Changes saved!');
     } catch (error) {
@@ -146,88 +150,96 @@ export const Employees = () => {
     }
   };
 
-  const isEmployee = true;
+  const isEmployee = user?.isStaff
 
   return (
-    <div>
-      {isEmployee && (
-        <div className="object-list">
+    <div className="employees">
           <h1>Employees</h1>
           {employees.map((employee) => {
-            const user = users.find((user) => user.id === employee.userId);
+            const employeeUser = users.find((user) => user.id === employee.userId);
+
+            // Check if the current employee is being edited
+        const employeeIsEditing = isEditing === employee.id;
 
             return (
-              <div key={employee.id} className="object-item">
-                <div className="object-details">
-                  <h2>{user.fullName}</h2>
-                  {user && (
+              <div key={employee.id}>
+                <div>
+                  <h2>{employeeUser.fullName}</h2>
+                  {employeeUser && (
                     <>
-                      <p>Name: {user.fullName}</p>
-                      <p>Email: {user.email}</p>
-                      <p>Phone: {user.phone}</p>
-                      <p>Address: {user.streetAddress}</p>
+                      <p>Name: {employeeUser.fullName}</p>
+                      <p>Email: {employeeUser.email}</p>
+                      <p>Phone: {employeeUser.phone}</p>
+                      <p>Address: {employeeUser.streetAddress}</p>
                     </>
                   )}
                   <p>Start Date: {employee.startDate}</p>
                   <p>Pay Rate: ${employee.payRate.toFixed(2)}</p>
 
                   {/* Edit and Delete buttons */}
-                  {isEmployee && editedUser && editedUser.id === user.id ? (
+                  {isEditing !== null && employeeIsEditing && (
                     <div className="edit-object">
                       <input
                         type="text"
                         id="employeeName"
-                        value={user.fullName}
+                        value={updatedFullName}
                         onChange={(e) => setUpdatedFullName(e.target.value)}
                       />
                       <input
                         type="text"
                         id="employeeEmail"
-                        value={user.email}
+                        value={updatedEmail}
                         onChange={(e) => setUpdatedEmail(e.target.value)}
                       />
                       <input
                         type="text"
                         id="employeePhone"
-                        value={user.phone}
+                        value={updatedPhone}
                         onChange={(e) => setUpdatedPhone(e.target.value)}
                       />
                       <input
                         type="text"
                         id="employeeAddress"
-                        value={user.streetAddress}
+                        value={updatedAddress}
                         onChange={(e) => setUpdatedAddress(e.target.value)}
                       />
                       <input
                         type="text"
                         id="startDate"
-                        value={employee.startDate}
+                        value={updatedStartDate}
                         onChange={(e) => setUpdatedStartDate(e.target.value)}
                       />
                       <input
                         type="text"
                         id="payRate"
-                        value={employee.payRate}
+                        value={updatedPayRate}
                         onChange={(e) => setUpdatedPayRate(e.target.value)}
                       />
-                      <button className="action-button" onClick={() => handleSave(user.id)}>
+                      <button className="action-button" onClick={() => handleSave(employeeUser.id)}>
                         Save
                       </button>
-                      <button className="action-button" onClick={() => setEditedUser(null)}>
+                      <button className="action-button" onClick={() => setIsEditing(null)}>
                         Cancel
                       </button>
                     </div>
-                  ) : (
+                  )}
+
+{isEditing === null && (
                     <div>
                       <button
                         className="action-button"
-                        onClick={() => handleEdit(user.id, employee.id)}
+                        onClick={() => handleEdit(employeeUser.id, employee.id)}
                       >
                         View/Edit Details
                       </button>
+                      </div>
+                      )}
+
+                      {isEmployee && (
+                        <div>
                       <button
                         className="action-button"
-                        onClick={() => handleDelete(employee.id, user.id)}
+                        onClick={() => handleDelete(employee.id, employeeUser.id)}
                       >
                         Delete
                       </button>
@@ -239,6 +251,3 @@ export const Employees = () => {
           })}
         </div>
       )}
-    </div>
-  );
-};

@@ -134,11 +134,11 @@ export const Stores = () => {
     <div>
       {isEmployee && (
         <div>
-          <StoreForm nextId={nextId} />
+          <StoreForm />
         </div>
       )}
 
-      <div className="object-list">
+      <div className="store">
         <h1>Stores</h1>
         {stores.map(({ id, storeName, storeAddress, storePhone, storeHours }) => {
           const gamesAvailable = gamesInStores
@@ -149,8 +149,8 @@ export const Stores = () => {
             });
 
           return (
-            <div key={id} className="object-item">
-              <div className="object-details">
+            <div key={id} className="store">
+              <div>
                 <h2>{storeName}</h2>
                 <p>Address: {storeAddress}</p>
                 <p>Phone: {storePhone}</p>
@@ -165,19 +165,19 @@ export const Stores = () => {
                   <input
                     type="text"
                     id="storeName"
-                    value={storeName}
+                    value={updatedStoreName}
                     onChange={(e) => setUpdatedStoreName(e.target.value)}
                   />
                   <input
                     type="text"
                     id="storeAddress"
-                    value={storeAddress}
+                    value={updatedAddress}
                     onChange={(e) => setUpdatedAddress(e.target.value)}
                   />
                   <input
                     type="text"
                     id="storePhone"
-                    value={storePhone}
+                    value={updatedPhone}
                     onChange={(e) => setUpdatedPhone(e.target.value)}
                   />
 

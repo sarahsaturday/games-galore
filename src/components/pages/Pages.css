@@ -317,7 +317,7 @@ p {
 .game {
   display: flex;
   flex-direction: column;
-  align-items:center;
+  align-items: center;
 }
 
 .game img {
@@ -376,32 +376,42 @@ p {
   cursor: not-allowed;
 }
 
-/* Store Page Styling */
+/* Stores Page Styling */
 
-.store-list {
+.store {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items:center;
 }
 
-.store-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
+.store img {
+  width: 100px;
 }
 
 .store-details {
-  margin-bottom: 10px;
-  align-items: flex-start;
+  flex-grow: 1; 
 }
 
-.edit-store,
-.store-actions {
+/* Customers Page Styling */
+
+.customers {
   display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.edit-store input,
-.edit-store button,
-.store-actions button {
-  margin-right: 10px;
+.customer-details {
+  flex-grow: 1; 
+}
+
+/* Employees Page Styling */
+
+.employees {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.employee-details {
+  flex-grow: 1; 
 }

@@ -152,7 +152,8 @@ export const Customers = () => {
   const isEmployee = user?.isStaff;
 
   return (
-    <div>
+    <div className="customers">
+          <h1>Customers</h1>
       {customers.map((customer) => {
         const customerUser = users.find((user) => user.id === customer.userId);
 
@@ -160,8 +161,8 @@ export const Customers = () => {
         const customerIsEditing = isEditing === customer.id;
 
         return (
-          <div key={customer.id} className="object-item">
-            <div className="object-details">
+          <div key={customer.id} className="customers">
+            <div>
               <h2>{customerUser.fullName}</h2>
               {customerUser && (
                 <>
@@ -174,7 +175,7 @@ export const Customers = () => {
               <p>Loyalty Number: {customer.loyaltyNumber}</p>
 
               {isEditing !== null && customerIsEditing && (
-                <div className="edit-object">
+                <div className="customer-details">
                   <input
                     type="text"
                     id="customerName"

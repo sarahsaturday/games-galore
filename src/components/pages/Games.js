@@ -14,7 +14,7 @@ export const Games = () => {
   const [categories, setCategories] = useState([]);
   const [gamesInStores, setGamesInStores] = useState([]);
   const [stores, setStores] = useState([]);
-
+  
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
     setUser(storedUser);
@@ -37,6 +37,7 @@ export const Games = () => {
         const response = await fetch('http://localhost:8088/games');
         const data = await response.json();
         setGames(data);
+        
       } catch (error) {
         console.error('Error fetching games:', error);
       }
@@ -138,6 +139,9 @@ export const Games = () => {
     }
   };
 
+  const handleGameTitleChange = (event) => {
+    setUpdatedGameTitle(event.target.value);
+  };
 
   const handleDelete = async (gameId) => {
     try {
@@ -155,7 +159,6 @@ export const Games = () => {
       console.error('Error deleting game:', error);
     }
   };
-  
 
   const isEmployee = user?.isStaff;
 
@@ -209,25 +212,32 @@ export const Games = () => {
                   <input
                     type="text"
                     id="gameTitle"
-                    value={gameTitle}
+                    value={updatedGameTitle}
                     onChange={(e) => setUpdatedGameTitle(e.target.value)}
                   />
-                  <input
-                    type="text"
-                    id="categoryId"
-                    value={categoryId}
-                    onChange={(e) => setUpdatedCategoryId(e.target.value)}
-                  />
-                  <input
+                  <select
+      id="categoryId"
+      value={updatedCategoryId}
+      onChange={(e) => setUpdatedCategoryId(e.target.value)}
+    >
+      <option value="">Select a category</option>
+      {categories.map((category) => (
+        <option key={category.id} value={category.id}>
+          {category.categoryName}
+        </option>
+      ))}
+    </select>
+
+                  {/* <input
                     type="text"
                     id="quantity"
-                    value={quantity}
+                    value={updatedQuantity}
                     onChange={(e) => setUpdatedQuantity(e.target.value)}
-                  />
+                  /> */}
                   <input
                     type="text"
                     id="price"
-                    value={price}
+                    value={updatedPrice}
                     onChange={(e) => setUpdatedPrice(e.target.value)}
                   />
                   <button className="action-button" onClick={() => handleSave(id)}>
@@ -242,7 +252,7 @@ export const Games = () => {
               {isEmployee && !editedGame && (
                 <div>
                   <button className="action-button" onClick={() => handleEdit(id)}>
-                    Edit
+                    View/Edit Details
                   </button>
                 </div>
               )}

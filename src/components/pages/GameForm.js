@@ -13,6 +13,7 @@ export const GameForm = ({ nextId }) => {
   const [storeQuantities, setStoreQuantities] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [gameAdded, setGameAdded] = useState(false);
 
   const handleGameTitleChange = (event) => {
     setGameTitle(event.target.value);
@@ -56,11 +57,14 @@ export const GameForm = ({ nextId }) => {
 
     setIsSubmitting(true);
 
+    const currentDate = new Date().toISOString().split('T')[0]; // Get today's date
+
     const newGame = {
       id: nextId,
       gameTitle: gameTitle,
       categoryId: parseInt(categoryId),
       price: parseFloat(price),
+      dateEntered: currentDate,
       imageUrl: imageUrl,
     };
 
@@ -100,17 +104,18 @@ export const GameForm = ({ nextId }) => {
 
         setIsSubmitting(false);
         navigate('/games');
-        // Display the alert
         window.alert('Game added!');
-      resetForm(); // Reset the form after successful submission
-    } else {
-      throw new Error('Error adding game');
+        resetForm(); // Reset the form after successful submission
+        setGameAdded(true)
+       
+      } else {
+        throw new Error('Error adding game');
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      console.error('Error adding game:', error);
     }
-  } catch (error) {
-    setIsSubmitting(false);
-    console.error('Error adding game:', error);
-  }
-};
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -136,6 +141,13 @@ export const GameForm = ({ nextId }) => {
     fetchCategories();
     fetchStores();
   }, []);
+
+  useEffect(() => {
+    if (gameAdded) {
+      setGameAdded(false); // Reset gameAdded to false
+      window.location.reload(); // Reload the page
+    }
+  }, [gameAdded]);
 
   return (
     <div className="games-form">
