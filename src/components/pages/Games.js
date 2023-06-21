@@ -14,6 +14,7 @@ export const Games = () => {
   const [categories, setCategories] = useState([]);
   const [gamesInStores, setGamesInStores] = useState([]);
   const [stores, setStores] = useState([]);
+  const [editedGamesInStores, setEditedGamesInStores] = useState(null)
   
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -104,10 +105,14 @@ export const Games = () => {
       gameTitle: updatedGameTitle,
       categoryId: updatedCategoryId,
       price: parseFloat(updatedPrice),
+      dateEntered: editedGame.dateEntered,
+      imageUrl: editedGame.imageUrl
     };
 
     const updatedGameInStore = {
-      gameId: gameId,
+      ...editedGamesInStores,
+      storeId: editedGame.storeId,
+      gameId: editedGame.gameId,
       quantity: updatedQuantity,
     };
 
@@ -132,6 +137,7 @@ export const Games = () => {
       setGames(updatedGames);
 
       setEditedGame(null);
+      setEditedGamesInStores(null)
 
       window.alert('Changes saved!');
     } catch (error) {
