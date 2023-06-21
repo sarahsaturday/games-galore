@@ -167,7 +167,7 @@ export const Games = () => {
         </div>
       )}
 
-      <div className="object-list">
+      <div className="game">
         <h1>Games</h1>
         {games.map(({ id, gameTitle, categoryId, price, imageUrl }) => {
           const category = categories.find((category) => category.id === categoryId);
@@ -177,7 +177,7 @@ export const Games = () => {
           const gameStores = gamesInStores.filter((gameInStore) => gameInStore.gameId === id);
 
           return (
-            <div key={id} className="object-item">
+            <div key={id} className="game">
               <img src={imageUrl} alt={gameTitle} style={{ width: '100px' }} />
               <h2>{gameTitle}</h2>
               <p>Category: {categoryName}</p>

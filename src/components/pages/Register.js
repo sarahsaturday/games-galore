@@ -114,6 +114,7 @@ export const Register = () => {
                                 .catch((error) => {
                                     console.error('Error fetching customers:', error);
                                 });
+                                
                         } else if (userType === 'employee') {
                             // Fetch existing employees from the database
                             fetch('http://localhost:8088/employees')
@@ -130,7 +131,6 @@ export const Register = () => {
                                         startDate: new Date(startDate).toISOString().split('T')[0], // Format as "YYYY-MM-DD"
                                         payRate: parseFloat(hourlyRate),
                                         userId: newUser.id,
-                                        storeId: parseInt(selectedStore),
                                     };
 
                                     // Add the new employee to the employees database
@@ -147,198 +147,204 @@ export const Register = () => {
                                             fetch(`http://localhost:8088/stores/${selectedStore}`)
                                                 .then((response) => response.json())
                                                 .then((store) => {
-                                                    // Get the current employee IDs array from the store object
-                                                    const employeeIds = store.employeeId || [];
+                                                    // Determine the highest ID in the employees_in_stores table
+                                                    fetch('http://localhost:8088/employees_in_stores')
+                                                        .then((response) => response.json())
+                                                        .then((employeesInStores) => {
+                                                            const highestEmployeeInStoreId = employeesInStores.reduce(
+                                                                (maxId, employeeInStore) => Math.max(maxId, parseInt(employeeInStore.id)),
+                                                                0
+                                                            );
 
-                                                    // Push the new employee ID into the employee IDs array
-                                                    employeeIds.push(newEmployee.id);
+                                                            // Create a new employee_in_store object with the next ID
+                                                            const newEmployeeInStore = {
+                                                                id: highestEmployeeInStoreId + 1,
+                                                                storeId: parseInt(selectedStore),
+                                                                employeeId: newEmployee.id,
+                                                            };
 
-                                                    // Update the selected store with the new employee ID
-                                                    fetch(`http://localhost:8088/stores/${selectedStore}`, {
-                                                        method: 'PATCH',
-                                                        headers: {
-                                                            'Content-Type': 'application/json',
-                                                        },
-                                                        body: JSON.stringify({
-                                                            employeeId: employeeIds,
-                                                        }),
-                                                    })
-                                                        .then(() => {
-                                                            // Store the registered user's information in local storage
-                                                            localStorage.setItem('gg_user', JSON.stringify(newUser));
+                                                            // Add the new employee_in_store object to the employees_in_stores table
+                                                            fetch('http://localhost:8088/employees_in_stores', {
+                                                                method: 'POST',
+                                                                headers: {
+                                                                    'Content-Type': 'application/json',
+                                                                },
+                                                                body: JSON.stringify(newEmployeeInStore),
+                                                            })
+                                                                .then(() => {
+                                                                    // Store the registered user's information in local storage
+                                                                    localStorage.setItem('gg_user', JSON.stringify(newUser));
 
-                                                            // Show the confirmation message in an alert window
-                                                            window.alert('Thank you for registering!');
+                                                                    // Show the confirmation message in an alert window
+                                                                    window.alert('Thank you for registering!');
 
-                                                            // Dispatch storage event to update the user state in the Header component
-                                                            window.dispatchEvent(new Event('storage'));
+                                                                    // Dispatch storage event to update the user state in the Header component
+                                                                    window.dispatchEvent(new Event('storage'));
 
-                                                            // Redirect the user to the home page
-                                                            navigate('/');
+                                                                    // Redirect the user to the home page
+                                                                    navigate('/');
+                                                                })
+                                                                .catch((error) => {
+                                                                    // Error updating the store object
+                                                                    console.error('Error updating store:', error);
+                                                                });
                                                         })
                                                         .catch((error) => {
-                                                            // Error updating the store object
-                                                            console.error('Error updating store:', error);
+                                                            // Error fetching the selected store
+                                                            console.error('Error fetching store:', error);
                                                         });
                                                 })
                                                 .catch((error) => {
-                                                    // Error fetching the selected store
-                                                    console.error('Error fetching store:', error);
+                                                    // Error adding the new employee
+                                                    console.error('Error adding employee:', error);
                                                 });
                                         })
                                         .catch((error) => {
-                                            // Error adding the new employee
-                                            console.error('Error adding employee:', error);
+                                            // Error fetching existing employees
+                                            console.error('Error fetching employees:', error);
                                         });
-                                })
-                                .catch((error) => {
-                                    // Error fetching existing employees
-                                    console.error('Error fetching employees:', error);
                                 });
                         }
                     });
-            })
-    }
+            });
 
 
-
-    return (
-        <div className="register-container">
-            <h2>New {userType === 'customer' ? 'Customer' : 'Employee'}</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    Choose One: <label>
-                        <input
-                            type="radio"
-                            value="customer"
-                            checked={userType === 'customer'}
-                            onChange={handleUserTypeChange}
-                        />
-                        I am a Customer&nbsp;
-                    </label>
-                    <label>
-                        <input
-                            type="radio"
-                            value="employee"
-                            checked={userType === 'employee'}
-                            onChange={handleUserTypeChange}
-                        />
-                        I am an Employee
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Full Name:&nbsp;
-                        <input
-                            type="text"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            required
-                            placeholder="First Last"
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Email:&nbsp;
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            placeholder="email@email.com"
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Phone:&nbsp;
-                        <input
-                            type="text"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            required
-                            placeholder="333-333-3333"
-                        />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Street Address:&nbsp;
-                        <input
-                            type="text"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            required
-                            placeholder="333 3rd St"
-                        />
-                    </label>
-                </div>
-                {userType === 'employee' && (
+        return (
+            <div className="register-container">
+                <h2>New {userType === 'customer' ? 'Customer' : 'Employee'}</h2>
+                <form onSubmit={handleSubmit}>
                     <div>
+                        Choose One: <label>
+                            <input
+                                type="radio"
+                                value="customer"
+                                checked={userType === 'customer'}
+                                onChange={handleUserTypeChange}
+                            />
+                            I am a Customer&nbsp;
+                        </label>
                         <label>
-                            Store:&nbsp;
-                            <select
-                                value={selectedStore}
-                                onChange={(e) => setSelectedStore(e.target.value)}
-                                required
-                            >
-                                {stores.map((store) => (
-                                    <option key={store.id} value={store.id}>
-                                        {store.storeName}
-                                    </option>
-                                ))}
-                            </select>
+                            <input
+                                type="radio"
+                                value="employee"
+                                checked={userType === 'employee'}
+                                onChange={handleUserTypeChange}
+                            />
+                            I am an Employee
                         </label>
                     </div>
-                )}
-                {userType === 'employee' && (
                     <div>
                         <label>
-                            Start Date:&nbsp;
+                            Full Name:&nbsp;
                             <input
-                                type="date"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
+                                type="text"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
                                 required
+                                placeholder="First Last"
                             />
                         </label>
                     </div>
-                )}
-                {userType === 'employee' && (
                     <div>
                         <label>
-                            Hourly Rate:&nbsp;
+                            Email:&nbsp;
                             <input
-                                type="number"
-                                step="0.00"
-                                value={hourlyRate}
-                                onChange={(e) => setHourlyRate(e.target.value)}
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
-                                placeholder="33.33"
+                                placeholder="email@email.com"
                             />
                         </label>
                     </div>
-                )}
-                {userType === 'employee' && (
                     <div>
                         <label>
-                            Check if Manager: &nbsp;
+                            Phone:&nbsp;
                             <input
-                                type="checkbox"
-                                checked={managers}
-                                onChange={(e) => setManagers(e.target.checked)}
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                required
+                                placeholder="333-333-3333"
                             />
                         </label>
                     </div>
-                )}
-                <button type="submit">Register</button>
-                <p><Link to="/">Cancel</Link>
+                    <div>
+                        <label>
+                            Street Address:&nbsp;
+                            <input
+                                type="text"
+                                value={address}
+                                onChange={(e) => setAddress(e.target.value)}
+                                required
+                                placeholder="333 3rd St"
+                            />
+                        </label>
+                    </div>
+                    {userType === 'employee' && (
+                        <div>
+                            <label>
+                                Store:&nbsp;
+                                <select
+                                    value={selectedStore}
+                                    onChange={(e) => setSelectedStore(e.target.value)}
+                                    required
+                                >
+                                    {stores.map((store) => (
+                                        <option key={store.id} value={store.id}>
+                                            {store.storeName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                        </div>
+                    )}
+                    {userType === 'employee' && (
+                        <div>
+                            <label>
+                                Start Date:&nbsp;
+                                <input
+                                    type="date"
+                                    value={startDate}
+                                    onChange={(e) => setStartDate(e.target.value)}
+                                    required
+                                />
+                            </label>
+                        </div>
+                    )}
+                    {userType === 'employee' && (
+                        <div>
+                            <label>
+                                Hourly Rate:&nbsp;
+                                <input
+                                    type="number"
+                                    step="0.00"
+                                    value={hourlyRate}
+                                    onChange={(e) => setHourlyRate(e.target.value)}
+                                    required
+                                    placeholder="33.33"
+                                />
+                            </label>
+                        </div>
+                    )}
+                    {userType === 'employee' && (
+                        <div>
+                            <label>
+                                Check if Manager: &nbsp;
+                                <input
+                                    type="checkbox"
+                                    checked={managers}
+                                    onChange={(e) => setManagers(e.target.checked)}
+                                />
+                            </label>
+                        </div>
+                    )}
+                    <button type="submit">Register</button>
+                    <p><Link to="/">Cancel</Link>
+                    </p>
+                </form>
+                <p>
+                    Already have an account? <Link to="/login">Log in here</Link>
                 </p>
-            </form>
-            <p>
-                Already have an account? <Link to="/login">Log in here</Link>
-            </p>
-        </div>
-    );
-};
+            </div>
+    )}}

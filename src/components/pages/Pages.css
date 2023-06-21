@@ -260,7 +260,8 @@ p {
 }
 
 .action-button {
-  margin-right: 8px;
+  margin-bottom: 10px;
+  flex-direction: row;
 }
 
 /* Games Form Styling */
@@ -315,12 +316,12 @@ p {
 
 .game {
   display: flex;
-  align-items:flex-start;
+  flex-direction: column;
+  align-items:center;
 }
 
 .game img {
-  width: 100px; 
-  margin-right: 10px; 
+  width: 100px;
 }
 
 .game-details {

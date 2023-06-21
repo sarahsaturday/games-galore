@@ -39,7 +39,6 @@ export const StoreForm = ({ nextId }) => {
       storeAddress: storeAddress,
       storePhone: storePhone,
       storeHours: storeHours,
-      employeeId: []
     };
 
     try {

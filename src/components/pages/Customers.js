@@ -12,6 +12,7 @@ export const Customers = () => {
   const [updatedPhone, setUpdatedPhone] = useState('');
   const [updatedAddress, setUpdatedAddress] = useState('');
   const [updatedLoyaltyNumber, setUpdatedLoyaltyNumber] = useState('');
+  const [isEditing, setIsEditing] = useState(null)
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
@@ -63,6 +64,9 @@ export const Customers = () => {
     const customer = customers.find((customer) => customer.id === customerId);
     setEditedCustomer(customer);
     setUpdatedLoyaltyNumber(customer.loyaltyNumber);
+
+    setIsEditing(customer.id); // Enable editing mode
+
   };
 
   const handleSave = async (userId) => {
@@ -72,6 +76,8 @@ export const Customers = () => {
       email: updatedEmail,
       phone: updatedPhone,
       streetAddress: updatedAddress,
+      isStaff: editedUser.isStaff,
+      isManager: editedUser.isManager,
     };
 
     const updatedCustomer = {
@@ -109,6 +115,7 @@ export const Customers = () => {
 
       setEditedUser(null);
       setEditedCustomer(null);
+      setIsEditing(null);
 
       window.alert('Changes saved!');
     } catch (error) {
@@ -146,89 +153,92 @@ export const Customers = () => {
 
   return (
     <div>
-      {isEmployee && (
-        <div className="object-list">
-          <h1>Customers</h1>
-          {customers.map((customer) => {
-            const user = users.find((user) => user.id === customer.userId);
+      {customers.map((customer) => {
+        const customerUser = users.find((user) => user.id === customer.userId);
 
-            return (
-              <div key={customer.id} className="object-item">
-                <div className="object-details">
-                  <h2>{user.fullName}</h2>
-                  {user && (
-                    <>
-                      <p>Name: {user.fullName}</p>
-                      <p>Email: {user.email}</p>
-                      <p>Phone: {user.phone}</p>
-                      <p>Address: {user.streetAddress}</p>
-                    </>
-                  )}
-                  <p>Loyalty Number: {customer.loyaltyNumber}</p>
+        // Check if the current customer is being edited
+        const customerIsEditing = isEditing === customer.id;
 
-                  {/* Edit and Delete buttons */}
-                  {isEmployee && editedUser && editedUser.id === user.id ? (
-                    <div className="edit-object">
-                      <input
-                        type="text"
-                        id="customerName"
-                        value={user.fullName}
-                        onChange={(e) => setUpdatedFullName(e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="customerEmail"
-                        value={user.email}
-                        onChange={(e) => setUpdatedEmail(e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="customerPhone"
-                        value={user.phone}
-                        onChange={(e) => setUpdatedPhone(e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="customerAddress"
-                        value={user.streetAddress}
-                        onChange={(e) => setUpdatedAddress(e.target.value)}
-                      />
-                      <input
-                        type="text"
-                        id="loyaltyNumber"
-                        value={customer.loyaltyNumber}
-                        onChange={(e) => setUpdatedLoyaltyNumber(e.target.value)}
-                      />
-                      <button className="action-button" onClick={() => handleSave(user.id)}>
-                        Save
-                      </button>
-                      <button className="action-button" onClick={() => setEditedUser(null)}>
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <div>
-                      <button
-                        className="action-button"
-                        onClick={() => handleEdit(user.id, customer.id)}
-                      >
-                        View/Edit Details
-                      </button>
-                      <button
-                        className="action-button"
-                        onClick={() => handleDelete(customer.id, user.id)}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  )}
+        return (
+          <div key={customer.id} className="object-item">
+            <div className="object-details">
+              <h2>{customerUser.fullName}</h2>
+              {customerUser && (
+                <>
+                  <p>Name: {customerUser.fullName}</p>
+                  <p>Email: {customerUser.email}</p>
+                  <p>Phone: {customerUser.phone}</p>
+                  <p>Address: {customerUser.streetAddress}</p>
+                </>
+              )}
+              <p>Loyalty Number: {customer.loyaltyNumber}</p>
+
+              {isEditing !== null && customerIsEditing && (
+                <div className="edit-object">
+                  <input
+                    type="text"
+                    id="customerName"
+                    value={updatedFullName}
+                    onChange={(e) => setUpdatedFullName(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    id="customerEmail"
+                    value={updatedEmail}
+                    onChange={(e) => setUpdatedEmail(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    id="customerPhone"
+                    value={updatedPhone}
+                    onChange={(e) => setUpdatedPhone(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    id="customerAddress"
+                    value={updatedAddress}
+                    onChange={(e) => setUpdatedAddress(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    id="loyaltyNumber"
+                    value={updatedLoyaltyNumber}
+                    onChange={(e) => setUpdatedLoyaltyNumber(e.target.value)}
+                  />
+                  <button className="action-button" onClick={() => handleSave(customerUser.id)}>
+                    Save
+                  </button>
+                  <button className="action-button" onClick={() => setIsEditing(null)}>
+                    Cancel
+                  </button>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  )
-};
+              )}
 
+              {isEditing === null && (
+                <div>
+                  <button
+                    className="action-button"
+                    onClick={() => handleEdit(customerUser.id, customer.id)}
+                  >
+                    View/Edit Details
+                  </button>
+                </div>
+              )}
+
+              {isEmployee && (
+                <div>
+                  <button
+                    className="action-button"
+                    onClick={() => handleDelete(customer.id, customerUser.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
