@@ -114,7 +114,7 @@ export const Register = () => {
                                 .catch((error) => {
                                     console.error('Error fetching customers:', error);
                                 });
-                                
+
                         } else if (userType === 'employee') {
                             // Fetch existing employees from the database
                             fetch('http://localhost:8088/employees')
@@ -208,9 +208,9 @@ export const Register = () => {
                     });
             });
 
-
+        }
         return (
-            <div className="register-container">
+            <div className="profile-form-container">
                 <h2>New {userType === 'customer' ? 'Customer' : 'Employee'}</h2>
                 <form onSubmit={handleSubmit}>
                     <div>
@@ -339,12 +339,13 @@ export const Register = () => {
                             </label>
                         </div>
                     )}
-                    <button type="submit">Register</button>
-                    <p><Link to="/">Cancel</Link>
+                    <button className="action-button" type="submit">Register</button>
+                    <p><Link to="/" className="logout-link">Cancel</Link>
                     </p>
                 </form>
                 <p>
-                    Already have an account? <Link to="/login">Log in here</Link>
+                    Already have an account? <Link to="/login" className="logout-link">Log in here</Link>
                 </p>
             </div>
-    )}}
+        )
+    }

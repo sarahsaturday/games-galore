@@ -88,15 +88,15 @@ export const StoreForm = ({ nextId }) => {
   }, [storeAdded]);
 
   return (
-    <div className="store-form">
-      <h2>Add New Store</h2>
+    <div className="stores-form">
+      <h1 className="h1-header-store">Add New Store</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="storeName">Store Name:</label>
+          <label htmlFor="gameTitle">Store Name:</label>
           <input
             type="text"
             id="storeName"
-            className="store-form-input"
+            className="games-form-input"
             value={storeName}
             onChange={handleStoreNameChange}
             required
@@ -107,7 +107,7 @@ export const StoreForm = ({ nextId }) => {
           <input
             type="text"
             id="storeAddress"
-            className="store-form-input"
+            className="games-form-input"
             placeholder="333 3rd St"
             value={storeAddress}
             onChange={handleStoreAddressChange}
@@ -119,7 +119,7 @@ export const StoreForm = ({ nextId }) => {
           <input
             type="text"
             id="storePhone"
-            className="store-form-input"
+            className="games-form-input"
             placeholder="333-333-3333"
             value={storePhone}
             onChange={handleStorePhoneChange}
@@ -131,7 +131,7 @@ export const StoreForm = ({ nextId }) => {
           <input
             type="text"
             id="storeHours"
-            className="store-form-input"
+            className="games-form-input"
             placeholder="9:00 AM - 6:00 PM"
             value={storeHours}
             onChange={handleStoreHoursChange}
@@ -141,7 +141,7 @@ export const StoreForm = ({ nextId }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="store-form-button"
+          className="action-button"
         >
           Add Store
         </button>

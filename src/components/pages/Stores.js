@@ -138,8 +138,8 @@ export const Stores = () => {
         </div>
       )}
 
-      <div className="store">
-        <h1>Stores</h1>
+        <h1 className="h1-header-store">Stores</h1>
+        <div className="object-list">
         {stores.map(({ id, storeName, storeAddress, storePhone, storeHours }) => {
           const gamesAvailable = gamesInStores
             .filter((gis) => gis.storeId === id)
@@ -149,7 +149,7 @@ export const Stores = () => {
             });
 
           return (
-            <div key={id} className="store">
+            <div key={id} className="object-container-store">
               <div>
                 <h2>{storeName}</h2>
                 <p>Address: {storeAddress}</p>

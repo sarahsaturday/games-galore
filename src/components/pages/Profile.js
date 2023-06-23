@@ -5,68 +5,89 @@ import './Pages.css';
 export const Profile = () => {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
-  const [profileType, setProfileType] = useState('');
-  const [storeName, setStoreName] = useState('')
+  const [isEditing, setIsEditing] = useState(false);
+  const [updatedFullName, setUpdatedFullName] = useState('');
+  const [updatedEmail, setUpdatedEmail] = useState('');
+  const [updatedPhone, setUpdatedPhone] = useState('');
+  const [updatedAddress, setUpdatedAddress] = useState('');
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('gg_user'));
     setUser(storedUser);
-
-    const handleStorageChange = () => {
-      const updatedUser = JSON.parse(localStorage.getItem('gg_user'));
-      setUser(updatedUser);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
   }, []);
-  
+
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const response = await fetch(`http://localhost:8088/users/${userId}`);
-        const userData = await response.json();
+      const response = await fetch(`http://localhost:8088/users/${userId}`);
+      const userData = await response.json();
+      if (userData.id === parseInt(userId)) {
         setUser(userData);
-
-        if (userData.isStaff === true) {
-          const employeeResponse = await fetch(
-            `http://localhost:8088/employees?userId=${userId}`
-          );
-          const employeeData = await employeeResponse.json();
-  
-          setProfileType('employee');
-          setUser((prevUser) => ({ ...prevUser, ...employeeData[0] }));
-  
-          const employeeId = employeeData[0]?.id;
-          const employeeInStoreResponse = await fetch(
-            `http://localhost:8088/employees_in_stores?employeeId=${employeeId}&_expand=store`
-          );
-          const employeeInStoreData = await employeeInStoreResponse.json();
-  
-          if (employeeInStoreData.length > 0) {
-            const storeName = employeeInStoreData[0]?.store?.storeName || '';
-            setStoreName(storeName);
-          }
-        } else {
-          const customerResponse = await fetch(
-            `http://localhost:8088/customers?userId=${userId}`
-          );
-          const customerData = await customerResponse.json();
-          setProfileType('customer');
-          setUser((prevUser) => ({ ...prevUser, ...customerData[0] }));
-        }
-      } catch (error) {
-        console.error('An error occurred while fetching user:', error);
       }
     };
 
     fetchUser();
   }, [userId]);
 
+  const handleEdit = () => {
+    setUpdatedFullName(user.fullName);
+    setUpdatedEmail(user.email);
+    setUpdatedPhone(user.phone);
+    setUpdatedAddress(user.streetAddress);
+    setIsEditing(true);
+  };
 
+  const handleSaveChanges = async () => {
+    try {
+      const updatedUser = {
+        ...user,
+        fullName: updatedFullName,
+        email: updatedEmail,
+        phone: updatedPhone,
+        streetAddress: updatedAddress,
+      };
+
+      // Update the user in the "users" array
+      await fetch(`http://localhost:8088/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedUser),
+      });
+
+      // Show the "Changes saved!" alert
+      alert('Changes saved!');
+
+      // Reset the profile to show the updated details
+      setUser(updatedUser);
+      setIsEditing(false);
+
+    } catch (error) {
+      console.error('An error occurred while updating user:', error);
+      // Display an error message or perform any other desired error handling
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      // Delete the user profile
+      await fetch(`http://localhost:8088/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      // Clear user session or perform any other logout logic
+      localStorage.removeItem('gg_user');
+
+      // Show the "Profile deleted!" message
+      alert('Profile deleted!');
+      setIsEditing(false);
+      // Redirect the user back to the home page
+      window.location.href = '/';
+    } catch (error) {
+      console.error('An error occurred while deleting the user:', error);
+      // Display an error message or perform any other desired error handling
+    }
+  };
 
   const handleLogout = () => {
     // Clear user session or perform any other logout logic
@@ -79,57 +100,56 @@ export const Profile = () => {
     window.location.href = '/';
   };
 
-  const renderEmployeeProfile = () => {
-    if (user && profileType === 'employee') {
-
-      const formattedPayRate = user.payRate ? `$${user.payRate.toFixed(2)} per hour` : '';
-
+  const renderProfileDetails = () => {
+    if (user !== null) {
       return (
-        <div className="profile-details">
-          <h2>Employee Profile</h2>
+        <div>
+          <h1 className="h1-header">Profile</h1>
           <p>
-            Name: {user.fullName}
-            <br />
-            Store Assignment: {storeName}
-            <br />
-            Start Date: {user.startDate}
-            <br />
-            Pay Rate: {formattedPayRate}
-            <br />
-            Phone Number: {user.phone}
-            <br />
-            Email Address: {user.email}
+            Name: {user.fullName} <br />
+            Email Address: {user.email} <br />
+            Phone Number: {user.phone} <br />
+            Street Address: {user.streetAddress} <br />
+            {user.isStaff && <span>Staff: Yes</span>}
+            {user.isManager && <span>Manager: Yes</span>}
           </p>
-          <div className="button-container">
-            <button className="action-button">Edit</button>
-            <button className="action-button">Save</button>
-            <button className="action-button">Delete Account</button>
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
 
-  const renderCustomerProfile = () => {
-    if (user && profileType === 'customer') {
-      return (
-        <div className="profile-details">
-          <h2>Customer Profile</h2>
-          <p>
-            Name: {user.fullName}
-            <br />
-            Loyalty Number: {user.loyaltyNumber}
-            <br />
-            Phone Number: {user.phone}
-            <br />
-            Email Address: {user.email}
-          </p>
-          <div className="button-container">
-  <button className="action-button">Edit</button>
-  <button className="action-button">Save</button>
-  <button className="action-button">Delete Account</button>
-</div>
+          {isEditing && (
+            <div className="form-details">
+              <input
+                type="text"
+                id="fullName"
+                value={updatedFullName}
+                onChange={(e) => setUpdatedFullName(e.target.value)}
+              />
+              <input
+                type="text"
+                id="email"
+                value={updatedEmail}
+                onChange={(e) => setUpdatedEmail(e.target.value)}
+              />
+              <input
+                type="text"
+                id="phone"
+                value={updatedPhone}
+                onChange={(e) => setUpdatedPhone(e.target.value)}
+              />
+              <input
+                type="text"
+                id="address"
+                value={updatedAddress}
+                onChange={(e) => setUpdatedAddress(e.target.value)}
+              />
+              <div>
+                <button className="action-button" onClick={handleSaveChanges}>
+                  Save Changes
+                </button>
+                <button className="action-button" onClick={() => setIsEditing(false)}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
@@ -137,9 +157,27 @@ export const Profile = () => {
   };
 
   return (
-    <div className="profile-container">
-      {renderEmployeeProfile() || renderCustomerProfile()}
-      <p><a href="#" className="logout-link" onClick={handleLogout}>Logout</a></p>
-  </div>
+    <div className="profile-form-container">
+      {renderProfileDetails()}
+
+      {!isEditing && (
+        
+          <div>
+            <button className="action-button" onClick={handleEdit}>
+              View/Edit Details
+            </button>
+            <button className="action-button" onClick={handleDelete}>
+              Delete Profile
+            </button>
+          </div>
+        
+      )}
+      <p>
+        <a href="#" className="logout-link" onClick={handleLogout}>
+          Logout
+        </a>
+      </p>
+    </div>
   );
 };
+

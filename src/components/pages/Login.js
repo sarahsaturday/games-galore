@@ -34,7 +34,7 @@ export const Login = () => {
 
   return (
     <div className="login-container">
-      <h2>Login</h2>
+      <h1 className="h1-header">Login</h1>
       <form onSubmit={handleLogin}>
         <label htmlFor="email">Email:</label>
         <input
@@ -44,10 +44,10 @@ export const Login = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button type="submit">Login</button>
+        <button className="action-button" type="submit">Login</button>
       </form>
-      <p>
-        Don't have an account? <Link to="/register">Register</Link>
+      <p className="centered-text">
+        Don't have an account? <Link to="/register" className="logout-link">Register</Link>
       </p>
     </div>
   );

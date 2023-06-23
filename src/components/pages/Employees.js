@@ -153,8 +153,9 @@ export const Employees = () => {
   const isEmployee = user?.isStaff
 
   return (
-    <div className="employees">
-          <h1>Employees</h1>
+    <> <h1 className="h1-header-employee">Employees</h1>
+    <div className="object-list">
+         
           {employees.map((employee) => {
             const employeeUser = users.find((user) => user.id === employee.userId);
 
@@ -162,7 +163,7 @@ export const Employees = () => {
         const employeeIsEditing = isEditing === employee.id;
 
             return (
-              <div key={employee.id}>
+              <div key={employee.id} className="object-container-employee">
                 <div>
                   <h2>{employeeUser.fullName}</h2>
                   {employeeUser && (
@@ -178,7 +179,7 @@ export const Employees = () => {
 
                   {/* Edit and Delete buttons */}
                   {isEditing !== null && employeeIsEditing && (
-                    <div className="edit-object">
+                    <div>
                       <input
                         type="text"
                         id="employeeName"
@@ -250,4 +251,5 @@ export const Employees = () => {
             );
           })}
         </div>
+        </>
       )}

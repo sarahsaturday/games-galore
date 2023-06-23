@@ -108,18 +108,16 @@ export const Home = () => {
     } else if (searchResults && searchResults.length > 0) {
       return (
         <div>
-          <ul>
             {searchResults.map((game, index) => (
-              <li key={index}>
+              <div key={index}>
                 <b>{game.gameTitle}</b>
                 <p>Price: {game.price}</p>
                 <p>Category: {game.category}</p>
                 {game.stores.map((store, storeIndex) => (
                   <p key={storeIndex}>Store Location: {store}</p>
                 ))}
-              </li>
+              </div>
             ))}
-          </ul>
         </div>
       );
     }
@@ -145,24 +143,34 @@ export const Home = () => {
 
   return (
     <div>
-      <div className="search-form">
-        <h2>Search</h2>
-        <form>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            placeholder="Search by game title"
-          />
-        </form>
-        {/* Render the search results */}
-        {renderSearchResults()}
-      </div>
-
-      <div className="slideshow-container">
-        <h1 className="new-arrivals-heading">New Arrivals</h1>
-        {renderSlideshow()}
+      <div>
+        <h1 className="h1-header">
+          <div className="scrolling-text-container">
+            <p className="scrolling-text">Search for Games</p>
+          </div>
+        </h1>
+        <div className="search-container">
+          <form className="search-form">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search by game title"
+            />
+          </form>
+          {searchResults && searchResults.length > 0 && (
+            <div className="search-results">
+              {/* Render the search results */}
+              {renderSearchResults()}
+            </div>
+          )}
+        </div>
+  
+        <h1 className="h1-header">New Arrivals</h1>
+        <div className="slideshow">
+          {renderSlideshow()}
+        </div>
       </div>
     </div>
   );
-};
+          }  

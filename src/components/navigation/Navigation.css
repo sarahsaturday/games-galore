@@ -1,88 +1,118 @@
 /* Header Styling */
+header {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  height: 200px;
+  /* Adjust the height as needed */
+  margin: 10px;
+  /* Add margin around the outside */
+}
+
+.video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.header-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
 .logo {
-    /* Add your logo styling */
-  }
-  
-  .navigation {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    padding: 20px;
-    margin: 0 auto;
-  }
-  
-  .navigation > * {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2px 1px;
-    margin: 0 5px;
-    color: #000;
-    text-decoration: none;
-    font-weight: bold;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-    background-color: transparent; 
-  }  
-  
-  .navigation > *:hover {
-    background-color: #ddd;
-  }
-  
-  .dropdown {
-    position: relative;
-    display: inline-block;
-  }
-  
-  .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
-  }
-  
-  .dropdown:hover .dropdown-content {
-    display: block;
-  }
-  
-  .employee-portal {
-    margin-left: 10px;
-  }
-  
-  /* Footer Styling */
+  background-image: url('https://sill.armymwr.com/application/files/8515/2709/6813/sill-games-galore.jpg');
+  background-size: contain;
+  /* Adjust the size of the image */
+  background-repeat: no-repeat;
+  /* Prevent the image from repeating */
+  width: 200px;
+  /* Set the width of the logo container */
+  height: 200px;
+  /* Set the height of the logo container */
+  margin: 40px;
+}
 
-  footer {
-    background-color: #f2f2f2;
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .contact-info {
-    text-align: left;
-  }
-  
-  .contact-info h3 {
-    margin-bottom: 10px;
-  }
-  
-  .sitemap ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .sitemap li {
-    margin-bottom: 5px;
-  }
-  
-  .sitemap a {
-    text-decoration: none;
-    color: #333;
-  }
-  
-  .sitemap a:hover {
-    text-decoration: underline;
-  }
+.navigation {
+  display: flex;
+  align-items: center;
+}
+
+.navigation>* {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 1px;
+  margin: 0 10px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  background-color: transparent;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.employee-portal {
+  margin-left: 10px;
+}
+
+/* Footer Styling */
+
+footer {
+  background-image: url('https://cf.ltkcdn.net/family/images/orig/314474-1600x1066-uno-rules-brief-history.jpg');
+  background-repeat: repeat;
+  /* Prevent the image from repeating */
+  background-position: left;
+  display: flex;
+  justify-content: space-between;
+  position:relative;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.contact-info {
+  text-align: left;
+  color: white;
+  background-color: black;
+  padding: 10px;
+}
+
+.sitemap {
+  text-align: right;
+  color: white;
+  padding: 10px;
+  background-color: black;
+}
+
+.sitemap a {
+  text-decoration: none;
+  color: white;
+}
+
+.sitemap a:hover {
+  text-decoration: underline;
+}

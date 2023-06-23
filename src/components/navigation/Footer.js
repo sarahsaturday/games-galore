@@ -25,7 +25,6 @@ export const Footer = () => {
           <li>
             <Link to="/search">Search</Link>
           </li>
-          {/* Add more links for other pages as needed */}
         </ul>
       </div>
     </footer>

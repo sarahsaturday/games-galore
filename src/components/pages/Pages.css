@@ -1,80 +1,94 @@
-/* Common Styling */
+/* USING */
 
 body {
   text-align: left;
-}
-
-button,
-input,
-select {
-  text-align: left;
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-/* Home Page Styling */
-
-.buttons-container {
+  background-image: url('https://pyxis.nymag.com/v1/imgs/6b2/67a/ee292658e2770188bb7727b75756fc5c89-Cones-of-Dunshire-Next-stage-6.2x.w710.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-  align-items: center;
-  height: 33.33vh;
-  background-color: transparent;
+  flex-direction: column;
+  min-height: 100vh;
+  margin: 0;
 }
 
-.home-button {
-  position: relative;
+ul {
+  list-style-type: none;
+}
+
+.h1-header {
+  text-align: center;
+  color: white;
+  background-color: #ff00b3;
+}
+
+.h1-header-store {
+  text-align: center;
+  color: white;
+  background-color: #0dee27;
+}
+
+.h1-header-game {
+  text-align: center;
+  color: #ffffff;
+  background-color: #ee0d33;
+}
+
+.h1-header-customer {
+  text-align: center;
+  color: #007bff;
+  background-color: #eaee0d;
+}
+
+.h1-header-employee {
+  text-align: center;
+  color: #80ff00;
+  background-color: #bd0dee;
+}
+
+.scrolling-text-container {
+  width: 100%; /* Set the width of the container */
+  overflow: hidden; /* Hide the overflowing content */
+}
+
+.scrolling-text {
+  animation: marquee 10s linear infinite; /* Set the animation properties */
+  white-space: nowrap; /* Prevent the text from wrapping */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%); /* Start offscreen to the right */
+  }
+  100% {
+    transform: translateX(-100%); /* Move offscreen to the left */
+  }
+}
+
+.slideshow {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  /* Set left and right margins to auto */
   display: flex;
   justify-content: center;
+  padding-bottom: 10px;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  width: 300px;
-  height: 80px;
-  margin-bottom: 20px;
-  background-color: transparent;
-  background-image: url(https://lakelandmom.com/wp-content/uploads/2019/05/Family-Board-Games.jpg);
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  text-decoration: none;
-  font-size: 24px;
-  font-weight: bold;
-  border-radius: 10px;
-}
-
-.home-button::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-}
-
-.button-text {
-  position: relative;
-  z-index: 1;
-  font-size: 53px;
-}
-
-.slideshow-container {
-  width: 100%;
-  max-width: 800px;
-  margin-top: 10rem;
-}
-
-.new-arrivals-heading {
-  text-align: center;
+  justify-content: center;
+ 
 }
 
 .search-form {
-  text-align: center;
-  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .search-form form {
@@ -90,199 +104,60 @@ h2 {
   font-size: 16px;
 }
 
-.search-form button {
-  height: 40px;
-  margin-left: 10px;
-  font-size: 16px;
-}
-
-
-/* Login Page Styling */
-
-.login-container {
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 20px;
-  background-color: #f7f7f7;
-  border: 1px solid #ddd;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  margin-bottom: 8px;
-}
-
-input {
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-p {
-  margin-top: 16px;
-  text-align: left;
-}
-
-p a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-p a:hover {
-  text-decoration: underline;
-}
-
-/* Register Page Styling */
-
-.register-container {
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 20px;
-  background-color: #f7f7f7;
-  border: 1px solid #ddd;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  margin-bottom: 8px;
-}
-
-input {
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-select {
-  padding: 8px;
-  margin-bottom: 16px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-p {
-  margin-top: 16px;
-  text-align: center;
-}
-
-p a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-p a:hover {
-  text-decoration: underline;
-}
-
-input::placeholder {
-  color: lightgray;
-}
-
-/* Profile Page Styling */
-
-.profile-container {
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 20px;
-  background-color: #f7f7f7;
-  border: 1px solid #ddd;
-}
-
-p {
-  text-align: center;
-}
-
-.profile-details {
+.search-results {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: left;
-}
-
-.profile-details p {
-  text-align: left;
-}
-
-.profile-details button {
-  margin-top: 16px;
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
+  border: 1px solid #ff00b3;
   border-radius: 4px;
-  cursor: pointer;
+  background-color: lime;
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 300px;
+  text-align: center;
+  line-height: 1.2;
 }
 
-.profile-details button:hover {
-  background-color: #0056b3;
-}
-
-.button-container {
+.form-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.action-button {
-  margin-bottom: 10px;
-  flex-direction: row;
+.profile-form-container {
+  max-width: 400px;
+  margin: 60px auto;
+  background-image: url('https://reviewed-com-res.cloudinary.com/image/fetch/s--AokJJo_h--/b_white,c_limit,cs_srgb,f_auto,fl_progressive.strip_profile,g_center,q_auto,w_972/https://reviewed-production.s3.amazonaws.com/1608044797082/lead.jpg');
+  background-position: top;
+  text-align: center;
+  color: white;
+  padding: 20px;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Games Form Styling */
+.logout-link {
+  color: white;
+}
 
 .games-form {
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #2200ff;
   border-radius: 4px;
-  background-color: #f8f8f8;
-}
-
-.games-form h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.games-form form {
-  display: flex;
-  flex-direction: column;
+  background-color: #ff9100;
 }
 
 .games-form label {
@@ -295,12 +170,12 @@ p {
   padding: 8px;
   margin-bottom: 10px;
   border-radius: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid #00bfff;
 }
 
 .games-form-button {
   padding: 10px;
-  background-color: #4caf50;
+  background-color: #ff00c3;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -312,106 +187,170 @@ p {
   cursor: not-allowed;
 }
 
-/* Games Page Styling */
-
-.game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.game img {
-  width: 100px;
-}
-
-.game-details {
-  flex-grow: 1; 
-}
-
-/* Store Form Styling */
-
-.store-form {
+.stores-form {
   max-width: 400px;
   margin: 0 auto;
   padding: 20px;
-  border: 1px solid #ccc;
+  border: 1px solid #fdfd01;
   border-radius: 4px;
-  background-color: #f8f8f8;
+  background-color: #f764c9;
 }
 
-.store-form h2 {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.store-form form {
-  display: flex;
-  flex-direction: column;
-}
-
-.store-form label {
+.stores-form label {
   font-weight: bold;
   margin-bottom: 5px;
 }
 
-.store-form-input,
-.store-form-select {
-  padding: 8px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.object-list {
+  display: flex;
+  flex-wrap: wrap;
+  /* Allow the boxes to wrap to the next line */
+  justify-content: space-evenly;
+  /* Distribute the boxes with space between them */
+  margin-bottom: 20px;
 }
 
-.store-form-button {
+.object-list-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.object-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Center the images vertically */
+  border: 1px solid #ff00b3;
+  border-radius: 4px;
+  background-color: lime;
   padding: 10px;
-  background-color: #4caf50;
+  margin-bottom: 20px;
+  width: 300px;
+  /* Adjust the width as per your preference */
+}
+
+.object-container-store {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Center the images vertically */
+  border: 1px solid #00ff5e;
+  border-radius: 4px;
+  background-color: rgb(0, 238, 255);
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 300px;
+  /* Adjust the width as per your preference */
+}
+
+.object-container-customer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Center the images vertically */
+  border: 1px solid #ff0000;
+  border-radius: 4px;
+  background-color: rgb(234, 129, 255);
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 300px;
+  /* Adjust the width as per your preference */
+}
+
+.object-container-employee {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Center the images vertically */
+  border: 1px solid #0033ff;
+  border-radius: 4px;
+  background-color: rgb(169, 251, 62);
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 300px;
+  /* Adjust the width as per your preference */
+}
+
+.object-image {
+  width: 100px;
+  margin-bottom: 10px;
+  /* Add margin to create space between image and text */
+}
+
+.object-details {
+  flex-grow: 1;
+  line-height: 1;
+  /* Adjust the line-height as per your preference */
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+  /* Adjust the line-height as per your preference */
+}
+
+.object-title {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.game-category,
+.game-price,
+.game-stores,
+.game-store {
+  font-size: 12px;
+}
+
+.form-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-button {
+  margin-top: 10px;
+  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 8px 16px;
+  background-color: #007bff;
   color: #fff;
   border: none;
   border-radius: 4px;
   cursor: pointer;
 }
 
-.store-form-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.login-container {
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+  background-image: url('https://reviewed-com-res.cloudinary.com/image/fetch/s--AokJJo_h--/b_white,c_limit,cs_srgb,f_auto,fl_progressive.strip_profile,g_center,q_auto,w_972/https://reviewed-production.s3.amazonaws.com/1608044797082/lead.jpg');
+  background-position: right;
+  border: 1px solid #ddd;
+  color: white;
 }
 
-/* Stores Page Styling */
-
-.store {
+form {
   display: flex;
   flex-direction: column;
-  align-items:center;
 }
 
-.store img {
-  width: 100px;
+label {
+  margin-bottom: 8px;
 }
 
-.store-details {
-  flex-grow: 1; 
+input {
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
-/* Customers Page Styling */
+.centered-text {
+  text-align: center;
+} 
+/********************************/
 
-.customers {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.customer-details {
-  flex-grow: 1; 
-}
-
-/* Employees Page Styling */
-
-.employees {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.employee-details {
-  flex-grow: 1; 
-}

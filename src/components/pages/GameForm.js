@@ -151,7 +151,7 @@ export const GameForm = ({ nextId }) => {
 
   return (
     <div className="games-form">
-      <h2>Add New Game</h2>
+      <h1 className="h1-header-game">Add New Game</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="gameTitle">Game Title:</label>
@@ -225,7 +225,7 @@ export const GameForm = ({ nextId }) => {
         </div>
         {selectedStores.map((storeId) => (
           <div key={storeId}>
-            <label htmlFor={`quantity-${storeId}`}>Quantity at Store {storeId}:</label>
+            <label htmlFor={`quantity-${storeId}`}>Quantity at {stores.find(store => store.id === storeId)?.storeName}:</label>
             <input
               type="number"
               id={`quantity-${storeId}`}
@@ -240,7 +240,7 @@ export const GameForm = ({ nextId }) => {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="games-form-button"
+          className="store-form-button"
         >
           Add Game
         </button>

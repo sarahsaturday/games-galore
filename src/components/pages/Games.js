@@ -176,8 +176,8 @@ export const Games = () => {
         </div>
       )}
 
-      <div className="game">
-        <h1>Games</h1>
+<h1 className="h1-header-game">Games</h1>
+      <div className="object-list">
         {games.map(({ id, gameTitle, categoryId, price, imageUrl }) => {
           const category = categories.find((category) => category.id === categoryId);
           const categoryName = category ? category.categoryName : 'Unknown Category';
@@ -186,14 +186,14 @@ export const Games = () => {
           const gameStores = gamesInStores.filter((gameInStore) => gameInStore.gameId === id);
 
           return (
-            <div key={id} className="game">
+            <div key={id} className="object-container">
               <img src={imageUrl} alt={gameTitle} style={{ width: '100px' }} />
               <h2>{gameTitle}</h2>
               <p>Category: {categoryName}</p>
               <p>Price: ${price}</p>
               <p>Available at:</p>
               {gameStores.length === 0 ? (
-                <p>Not available in any store</p>
+                <p key="not-available">Not available in any store</p>
               ) : (
                 gameStores.map((gameStore) => {
                   const store = stores.find((store) => store.id === gameStore.storeId);
@@ -204,10 +204,10 @@ export const Games = () => {
                   }
 
                   return (
-                    <p><span key={store.id}>
+                    <span key={store.id}>
                       {store.storeName} (In Stock: {storeQuantity})
                     </span>
-                    </p>
+              
                   );
                 })
               )}

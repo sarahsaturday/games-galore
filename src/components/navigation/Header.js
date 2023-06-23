@@ -38,9 +38,16 @@ export const Header = () => {
 
   return (
     <header>
-      <div className="logo">
-        {/* Games Galore company logo */}
+      <div className="video-container">
+        <video autoPlay muted={true} loop={true} className="header-video">
+          <source src="https://dm0qx8t0i9gc9.cloudfront.net/watermarks/video/H22QrVJSiphb57vz/videoblocks-a-man-playing-at-home-table-board-game-with-cards-go-chips-and-dice_rzmtzbl_f__3cb9ef96ae25e8175b3a67c0c4badbba__P360.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
       </div>
+
+      <div className="logo">
+      </div>
+      
       <nav className="navigation">
         {isLoggedIn && isEmployee && (
           <div className="dropdown">
