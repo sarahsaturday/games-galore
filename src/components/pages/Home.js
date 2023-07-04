@@ -146,10 +146,11 @@ export const Home = () => {
       <div>
         <h1 className="h1-header">
           <div className="scrolling-text-container">
-            <p className="scrolling-text">Search for Games</p>
+            <p className="scrolling-text">Welcome to Games Galore</p>
           </div>
         </h1>
-        <div className="search-container">
+        <div className="login-container">
+        <h1 className="h1-header-game">Search for Games</h1>
           <form className="search-form">
             <input
               type="text"
